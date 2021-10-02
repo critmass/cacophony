@@ -1,0 +1,15 @@
+{
+    "type":"object",
+    "required":[
+        "user_id",
+        "role_id"
+    ],
+    "properties":{
+        "user_id":{
+            "type":"integer"
+        },
+        "role_id":{
+            "type":"integer"
+        }
+    }
+}

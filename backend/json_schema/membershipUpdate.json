@@ -1,0 +1,19 @@
+{
+    "type":"object",
+    "required":[
+        "membership_id"
+    ],
+    "properties":{
+        "membership_id":{
+            "type":"integer"
+        },
+        "new_nickname":{
+            "type":"string",
+            "minLength":1,
+            "maxLength":32
+        },
+        "new_role_id": {
+            "type": "integer"
+        }
+    }
+}

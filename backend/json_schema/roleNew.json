@@ -1,0 +1,14 @@
+{
+    "type":"object",
+    "required":["title", "server_id"],
+    "properties":{
+        "title":{
+            "type":"string",
+            "minLength":3,
+            "maxLength":32
+        },
+        "server_id":{
+            "type":"integer"
+        }
+    }
+}
