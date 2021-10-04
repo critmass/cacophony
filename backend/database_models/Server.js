@@ -7,6 +7,8 @@ class Server {
 
     static async create(serverName, picture_url=null);
 
+    static async findAll();
+
     static async find(serverName=null);
 
     static async get(id);
@@ -17,9 +19,7 @@ class Server {
 
     static async getRoles(id);
 
-    static async updateName(id, newName);
-
-    static async updateSetting(id, newSettings);
+    static async update(id, {newName=null, newSettings=null});
 
     static async delete(id);
 }

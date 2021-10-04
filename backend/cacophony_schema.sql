@@ -22,6 +22,7 @@ CREATE TABLE "servers" (
     "name" varchar   NOT NULL,
     "picture_url" varchar   NULL,
     "start_date" timestamp [ 5 ]  NOT NULL,
+    "private" boolean   NOT NULL,
     "settings" int   NULL,
     CONSTRAINT "pk_servers" PRIMARY KEY (
         "id"
@@ -71,6 +72,7 @@ CREATE TABLE "rooms" (
     "name" varchar   NOT NULL,
     "server_id" int   NOT NULL,
     "type" varchar   NOT NULL,
+    "private" boolean   NULL,
     "settings" int   NULL,
     CONSTRAINT "pk_rooms" PRIMARY KEY (
         "id"
@@ -80,7 +82,8 @@ CREATE TABLE "rooms" (
 CREATE TABLE "access" (
     "room_id" int   NOT NULL,
     "role_id" int   NOT NULL,
-    "is_moderator" boolean   NOT NULL
+    "read_only" boolean   NULL,
+    "is_moderator" boolean   NULL
 );
 
 CREATE TABLE "posts" (
@@ -132,7 +135,7 @@ ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_member_id" FOREIGN KEY("member_id")
 REFERENCES "memberships" ("id");
 
 ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_threaded_from" FOREIGN KEY("threaded_from")
-REFERENCES "POSTS" ("id");
+REFERENCES "posts" ("id");
 
 ALTER TABLE "reactions" ADD CONSTRAINT "fk_reactions_post_id" FOREIGN KEY("post_id")
 REFERENCES "posts" ("id");
