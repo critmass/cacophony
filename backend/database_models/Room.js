@@ -5,7 +5,7 @@ const db = require("../db")
 
 class Room {
 
-    static async create(name, type, serverId);
+    static async create(name, serverId, type="text");
 
     static async find(serverId);
 
