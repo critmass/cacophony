@@ -5,9 +5,13 @@ const db = require("../db")
 
 class Membership {
 
-    static async create(userId, roleId);
+    static async create(userId, roleId, picture_url=null);
 
-    static async find(userId=null, roleId=null, serverId=null);
+    static async findByServer(serverId);
+
+    static async findByUser(userId);
+
+    static async findByRole(roleId);
 
     static async get(id);
 

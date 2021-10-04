@@ -61,6 +61,7 @@ CREATE TABLE "memberships" (
     "server_id" int   NOT NULL,
     "nickname" varchar   NOT NULL,
     "joining_date" timestamp [ 5 ]  NOT NULL,
+    "picture_url" varchar NULL,
     "settings" int   NULL,
     CONSTRAINT "pk_memberships" PRIMARY KEY (
         "id"
