@@ -3,8 +3,7 @@
 const Server = require("../../database_models/Server")
 const {
     NotFoundError,
-    BadRequestError,
-    UnauthorizedError,
+    BadRequestError
 } = require("../../expressError")
 
 const {
@@ -84,50 +83,6 @@ describe("Create", () => {
             expect(err instanceof BadRequestError).toBeTruthy()
         }
     })
-})
-
-describe("Get Members", () => {
-    it("gets a list a members", async () => {
-        const members = Server.getMembers(1)
-        expect(members.length).toBe(3)
-    })
-    it("throws an error if you pass a bad id", async () => {
-        try {
-            await Server.getMembers(5000)
-        } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
-        }
-    })
-})
-
-describe("Get Roles", () => {
-    it("gets a list a roles", async () => {
-        const members = Server.getRoles(1)
-        expect(members.length).toBe(2)
-    })
-    it("throws an error if you pass a bad id", async () => {
-        try {
-            await Server.getRoles(5000)
-        } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
-        }
-    })
-
-})
-
-describe("Get Rooms", () => {
-    it("gets a list a rooms", async () => {
-        const members = Server.getRooms(1)
-        expect(members.length).toBe(2)
-    })
-    it("throws an error if you pass a bad id", async () => {
-        try {
-            await Server.getRooms(5000)
-        } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
-        }
-    })
-
 })
 
 describe("Delete", () => {

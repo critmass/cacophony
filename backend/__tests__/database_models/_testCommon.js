@@ -89,6 +89,7 @@ const commonBeforeAll = async () => {
         VALUES
             ('room11', 1, 'text'),
             ('room12', 1, 'text'),
+            ('room13', 1, 'text'),
             ('room21', 2, 'text'),
             ('room22', 2, 'text'),
             ('room31', 3, 'text'),
@@ -96,14 +97,9 @@ const commonBeforeAll = async () => {
         RETURN id, name
     `)
     await db.query(`
-        INSERT INTO access (user_id, room_id, is_moderators)
+        INSERT INTO access (role_id, room_id, is_moderators)
         VALUES
-            (1, 1, true), (2, 1, false), (2, 1, false),
-            (1, 2, true), (2, 2, false), (2, 2, false),
-            (1, 3, false), (2, 3, true), (2, 3, false),
-            (1, 4, false), (2, 4, true), (2, 4, false),
-            (1, 5, false), (2, 5, false), (2, 5, true),
-            (1, 6, false), (2, 6, false), (2, 6, true)
+            (1, 1, true), (2, 1, false), (1, 2, true), (2, 2, false)
     `)
     await db.query(`
         INSERT INTO posts (room_id, member_id, content, post_date)

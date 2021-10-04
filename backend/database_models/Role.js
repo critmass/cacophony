@@ -2,10 +2,11 @@
 
 const db = require("../db")
 
+const defaultColor = {r:255, b:255, g:255}
 
 class Role {
 
-    static async create(title, serverId);
+    static async create(title, serverId, color=defaultColor);
 
     static async find(serverId);
 
@@ -17,7 +18,7 @@ class Role {
 
     static async removeAccess(id, roomId);
 
-    static async updateModeratorStatus(id, roomId, isModerator);
+    static async changeModeratorStatus(id, roomId, isModerator);
 
     static async remove(id);
 }

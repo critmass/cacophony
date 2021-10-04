@@ -13,12 +13,6 @@ class Server {
 
     static async get(id);
 
-    static async getRooms(id);
-
-    static async getMembers(id);
-
-    static async getRoles(id);
-
     static async update(id, {newName=null, newSettings=null});
 
     static async delete(id);
