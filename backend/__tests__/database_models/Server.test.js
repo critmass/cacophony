@@ -130,10 +130,17 @@ describe("Get Rooms", () => {
 
 })
 
-describe("Update", () => {
-
-})
-
 describe("Delete", () => {
-
+    it("deletes a server", async () => {
+        const server = Server.delete(1)
+        expect(server.name).toBe('s1')
+    })
+    it("throws an error if you try to delete a server that doesn't exist", async () => {
+        try {
+            await Server.delete(5000)
+        }
+        catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy()
+        }
+    })
 })
