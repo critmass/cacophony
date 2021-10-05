@@ -5,7 +5,7 @@ const db = require("../db")
 
 class Post {
 
-    static async create(userId, roomId, content, threadedFrom=null);
+    static async create(memberId, roomId, content, threadedFrom=null);
 
     static async find(roomId);
 
