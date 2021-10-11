@@ -8,6 +8,7 @@ CREATE TABLE "users" (
     "picture_url" varchar   NULL,
     "joining_date" timestamp [ 4 ]  NOT NULL,
     "last_on" timestamp   NOT NULL,
+    "is_site_admin" boolean NULL,
     "setting" int   NULL,
     CONSTRAINT "pk_users" PRIMARY KEY (
         "id"
@@ -105,42 +106,42 @@ CREATE TABLE "reactions" (
     "type" varchar   NOT NULL
 );
 
-ALTER TABLE "invites" ADD CONSTRAINT "fk_invites_role_id" FOREIGN KEY("role_id")
-REFERENCES "roles" ("id");
+ALTER TABLE "invites" ADD CONSTRAINT "fk_invites_role_id"
+FOREIGN KEY("role_id") REFERENCES "roles" ("id");
 
-ALTER TABLE "roles" ADD CONSTRAINT "fk_roles_server_id" FOREIGN KEY("server_id")
-REFERENCES "servers" ("id");
+ALTER TABLE "roles" ADD CONSTRAINT "fk_roles_server_id"
+FOREIGN KEY("server_id") REFERENCES "servers" ("id");
 
-ALTER TABLE "memberships" ADD CONSTRAINT "fk_memberships_user_id" FOREIGN KEY("user_id")
-REFERENCES "users" ("id");
+ALTER TABLE "memberships" ADD CONSTRAINT "fk_memberships_user_id"
+FOREIGN KEY("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "memberships" ADD CONSTRAINT "fk_memberships_role_id" FOREIGN KEY("role_id")
-REFERENCES "roles" ("id");
+ALTER TABLE "memberships" ADD CONSTRAINT "fk_memberships_role_id"
+FOREIGN KEY("role_id") REFERENCES "roles" ("id");
 
-ALTER TABLE "memberships" ADD CONSTRAINT "fk_memberships_server_id" FOREIGN KEY("server_id")
-REFERENCES "servers" ("id");
+ALTER TABLE "memberships" ADD CONSTRAINT "fk_memberships_server_id"
+FOREIGN KEY("server_id") REFERENCES "servers" ("id");
 
-ALTER TABLE "rooms" ADD CONSTRAINT "fk_rooms_server_id" FOREIGN KEY("server_id")
-REFERENCES "servers" ("id");
+ALTER TABLE "rooms" ADD CONSTRAINT "fk_rooms_server_id"
+FOREIGN KEY("server_id") REFERENCES "servers" ("id");
 
-ALTER TABLE "access" ADD CONSTRAINT "fk_access_room_id" FOREIGN KEY("room_id")
-REFERENCES "rooms" ("id");
+ALTER TABLE "access" ADD CONSTRAINT "fk_access_room_id"
+FOREIGN KEY("room_id") REFERENCES "rooms" ("id");
 
-ALTER TABLE "access" ADD CONSTRAINT "fk_access_role_id" FOREIGN KEY("role_id")
-REFERENCES "roles" ("id");
+ALTER TABLE "access" ADD CONSTRAINT "fk_access_role_id"
+FOREIGN KEY("role_id") REFERENCES "roles" ("id");
 
-ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_room_id" FOREIGN KEY("room_id")
-REFERENCES "rooms" ("id");
+ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_room_id"
+FOREIGN KEY("room_id") REFERENCES "rooms" ("id");
 
-ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_member_id" FOREIGN KEY("member_id")
-REFERENCES "memberships" ("id");
+ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_member_id"
+FOREIGN KEY("member_id") REFERENCES "memberships" ("id");
 
-ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_threaded_from" FOREIGN KEY("threaded_from")
-REFERENCES "posts" ("id");
+ALTER TABLE "posts" ADD CONSTRAINT "fk_posts_threaded_from"
+FOREIGN KEY("threaded_from") REFERENCES "posts" ("id");
 
-ALTER TABLE "reactions" ADD CONSTRAINT "fk_reactions_post_id" FOREIGN KEY("post_id")
-REFERENCES "posts" ("id");
+ALTER TABLE "reactions" ADD CONSTRAINT "fk_reactions_post_id"
+FOREIGN KEY("post_id") REFERENCES "posts" ("id");
 
-ALTER TABLE "reactions" ADD CONSTRAINT "fk_reactions_member_id" FOREIGN KEY("member_id")
-REFERENCES "memberships" ("id");
+ALTER TABLE "reactions" ADD CONSTRAINT "fk_reactions_member_id"
+FOREIGN KEY("member_id") REFERENCES "memberships" ("id");
 

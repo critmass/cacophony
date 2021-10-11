@@ -2,15 +2,25 @@
 
 
 const intToColor = ( colorAsNumber ) => {
-    const r = Math.floor( colorAsNumber / (255 ** 2) )
-    const b = Math.floor( (colorAsNumber - r) / 255 )
+
+    const r = Math.floor( colorAsNumber / (256 ** 2) )
+    const b = Math.floor( (colorAsNumber - r) / 256 )
     const g = colorAsNumber - r - b
+
+    if( r > 256 || colorAsNumber < 0 ) throw Error("outside bounds")
 
     return {r,b,g}
 }
 
 const colorToInt = ( color ) => {
-    return color.r * 255**2 + color.b * 255 + color.g
+
+    if(
+        color.r > 256 || color.r < 0 ||
+        color.b > 256 || color.b < 0 ||
+        color.g > 256 || color.g < 0
+    ) throw Error("outside bounds")
+
+    return color.r * 256**2 + color.b * 256 + color.g
 }
 
 module.exports = { intToColor, colorToInt }

@@ -4,14 +4,54 @@
 
 const jsonschema = require("jsonschema");
 
-const User = require("../database_models/user");
+const Room = require("../database_models/Room");
 const express = require("express");
 const router = new express.Router();
-const { createToken } = require("../helpers/tokens");
-const userAuthSchema = require("../json_schemas/userAuth.json");
-const userRegisterSchema = require("../json_schemas/userRegister.json");
+const newRoomSchema = require("../json_schema/roomNew.json")
 const { BadRequestError } = require("../expressError");
 
+/** POST / {room_name} => {room:{room_id}} */
 
+const createRoom = async (req, res, next) => { }
 
-module.exports = router
+/** GET / => {serverId, rooms:[{room_id, room_name, type}, ...]} */
+
+const getRooms =  async (req, res, next) => { }
+
+/** GET /[room_id] => {room:{
+ *                          room_id,
+ *                          room_name,
+ *                          type,
+ *                          members:[{
+ *                              membership_id,
+ *                              nickname
+ *                          }, ...]
+ *                      }}
+ * */
+
+const getRoom = async (req, res, next) => { }
+
+/** PATCH /[room_id] {room_id, new_name} => {
+ *                                      serverId,
+ *                                      room:{room_id, room_name, type}
+ *                                  }
+ * */
+
+const patchRoom =  async (req, res, next) => { }
+
+/** DELETE /[room_id] => {serverId, room:{room_id, room_name, type}} */
+
+const deleteRoom = async (req, res, next) => { }
+
+/** WS /[room_id] => a websocket connection to the room at room_id */
+
+const roomWebsocket = async (ws, req, next) => { }
+
+module.exports = {
+                createRoom,
+                getRoom,
+                getRooms,
+                patchRoom,
+                deleteRoom,
+                roomWebsocket
+            }
