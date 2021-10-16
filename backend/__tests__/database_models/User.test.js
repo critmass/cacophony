@@ -46,7 +46,7 @@ describe("Authenticate User", () => {
     })
 })
 
-dscribe("Find All Users", () => {
+describe("Find All Users", () => {
     it("returns all", async () => {
         const users = await User.findAll()
         expect(users.length).toBe(3)
