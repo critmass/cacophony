@@ -1,5 +1,7 @@
 ﻿-- Exported from QuickDBD: https://www.quickdatabasediagrams.com/
--- NOTE! If you have used non-SQL datatypes in your design, you will have to change these here.
+-- NOTE! If you have used non-SQL datatypes in your design,
+-- you will have to change these here.
+
 ;
 CREATE TABLE "users" (
     "id" SERIAL   NOT NULL,
@@ -9,7 +11,6 @@ CREATE TABLE "users" (
     "joining_date" timestamp [ 4 ]  NOT NULL,
     "last_on" timestamp   NOT NULL,
     "is_site_admin" boolean NULL,
-    "setting" int   NULL,
     CONSTRAINT "pk_users" PRIMARY KEY (
         "id"
      ),
@@ -24,7 +25,6 @@ CREATE TABLE "servers" (
     "picture_url" varchar   NULL,
     "start_date" timestamp [ 5 ]  NOT NULL,
     "private" boolean   NOT NULL,
-    "settings" int   NULL,
     CONSTRAINT "pk_servers" PRIMARY KEY (
         "id"
      ),
@@ -49,7 +49,6 @@ CREATE TABLE "roles" (
     "server_id" int   NOT NULL,
     "color" int   NOT NULL,
     "is_admin" boolean   NOT NULL,
-    "settings" int   NULL,
     CONSTRAINT "pk_roles" PRIMARY KEY (
         "id"
      )
@@ -63,7 +62,6 @@ CREATE TABLE "memberships" (
     "nickname" varchar   NOT NULL,
     "joining_date" timestamp [ 5 ]  NOT NULL,
     "picture_url" varchar NULL,
-    "settings" int   NULL,
     CONSTRAINT "pk_memberships" PRIMARY KEY (
         "id"
      )
@@ -75,7 +73,6 @@ CREATE TABLE "rooms" (
     "server_id" int   NOT NULL,
     "type" varchar   NOT NULL,
     "private" boolean   NULL,
-    "settings" int   NULL,
     CONSTRAINT "pk_rooms" PRIMARY KEY (
         "id"
      )

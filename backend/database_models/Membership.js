@@ -30,7 +30,9 @@ class Membership {
      *          }
      */
 
-    static async create(userId, roleId, picture_url=null);
+    static async create(userId, roleId, picture_url=null) {
+
+    };
 
     /** Finds members by server
      *

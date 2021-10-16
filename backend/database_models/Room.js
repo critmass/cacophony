@@ -7,13 +7,16 @@ const db = require("../db")
 class Room {
 
     /** Creates a room (from data), update db, return new room data.
+     *
      * data should be { name, serverId, type }
+     *
      * returns { id, name, serverId, type }
      */
 
     static async create(name, serverId, type="text");
 
     /** Finds all rooms in a given server by serverId
+     *
      * returns [{id, name, serverId, type}, ...]
      */
 

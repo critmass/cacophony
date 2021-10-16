@@ -7,7 +7,9 @@ const defaultColor = {r:255, b:255, g:255}
 class Role {
 
     /** Creates a new role based on data
+     *
      * data should be {title, serverId, color}
+     *
      * returns {id, title, serverId, color}
      */
 
