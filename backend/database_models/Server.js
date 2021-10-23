@@ -14,18 +14,21 @@ class Server {
 
     static async create(serverName, picture_url=null) {
 
+        const now = new Date()
+
         const result = await db.query(`
-                INSERT INTO servers (name, picture_url)
-                VALUES ($1, $2)
-                RETURN id, name, picture_url
-        `, [serverName, picture_url])
+                INSERT INTO servers (name, picture_url, start_date)
+                VALUES ($1, $2, $3)
+                RETURNING id, name, picture_url, start_date
+        `, [serverName, picture_url, now])
 
         const user = result.rows[0]
 
         return {
             id:user.id,
             name:user.name,
-            picture_url:user.picture_url
+            picture_url:user.picture_url,
+            start_date:user.start_date
         }
     };
 
@@ -44,6 +47,7 @@ class Server {
                 FROM servers s
                 LEFT JOIN memberships m
                     ON m.server_id = s.id
+                GROUP BY s.id
         `)
 
         return result.rows.map( row => {
@@ -76,6 +80,8 @@ class Server {
                 LEFT JOIN memberships m
                     ON m.server_id = s.id
                 WHERE s.name = $1
+                GROUP BY s.id
+
         `, [serverName])
 
         if(!result.rows[0].id) throw new NotFoundError("no servers with that name")
@@ -155,7 +161,7 @@ class Server {
         const result = db.query(`
                 UPDATE servers SET name = $2
                 WHERE id = $1
-                RETURN id, name, picture_url
+                RETURNING id, name, picture_url
         `, [id, newName])
 
         if( !result.rows[0].id ) throw NotFoundError("no id found")
@@ -194,15 +200,63 @@ class Server {
 
     static async delete(id) {
 
+        await db.query(`
+            DELETE FROM reactions
+            WHERE post_id = ANY (
+                SELECT p.id FROM posts p
+                INNER JOIN rooms r ON p.room_id = r.id
+                WHERE r.server_id = $1
+            )
+        `, [id])
+
+        await db.query(`
+            DELETE FROM posts
+            WHERE room_id = ANY (
+                SELECT id FROM rooms
+                WHERE server_id = $1
+            )
+        `, [id])
+
+        await db.query(`
+            DELETE FROM access
+            WHERE room_id = ANY (
+                SELECT id FROM rooms
+                WHERE server_id = $1
+            )
+        `,[id])
+
+        await db.query(`
+            DELETE FROM memberships
+            WHERE server_id = $1
+        `, [id])
+
+        await db.query(`
+            DELETE FROM roles
+            WHERE server_id = $1
+        `, [id])
+
+        await db.query(`
+            DELETE FROM rooms
+            WHERE server_id = $1
+        `,[id])
+
         const result = await db.query(`
                 DELETE FROM servers
                 WHERE id = $1
-                RETURN name, picture_url
-        `, [id])
+                RETURNING name, picture_url, start_date
+        `,[id])
 
-        if (!result.rows[0].name) throw NotFoundError("no id found")
+        const deletedServerData = result.rows[0]
 
-        return { ...result.rows[0] }
+        if (!deletedServerData) throw new NotFoundError("no id found")
+
+        console.log(deletedServerData)
+
+        return {
+            name: deletedServerData.name,
+            picture_url: deletedServerData.picture_url,
+            start_date:deletedServerData.start_date
+        }
     };
 }
 

@@ -21,9 +21,9 @@ const PORT = +process.env.PORT || 3001;
 // production database
 function getDatabaseUri() {
     return (process.env.NODE_ENV === "test")
-        ? `postgresql://postgres:${password}@localhost/Cacophony_test`
+        ? `postgresql://postgres:${password}@localhost/cacophony_test`
         : process.env.DATABASE_URL ||
-        `postgresql://postgres:${password}@localhost/Cacophony`
+        `postgresql://postgres:${password}@localhost/cacophony`
 }
 
 // Speed up bcrypt during tests, since the algorithm safety isn't being tested

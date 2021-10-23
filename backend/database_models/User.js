@@ -5,9 +5,8 @@ const bcrypt = require("bcrypt");
 const db = require("../db")
 const { BCRYPT_WORK_FACTOR } = require("../config");
 const { UnauthorizedError, NotFoundError } = require("../expressError");
-const { throws } = require("assert");
-const { timeStamp } = require("console");
-const { timeJSToSQL } = require("../helpers/timeConverter");
+
+
 
 /** Related functions for users */
 
@@ -19,7 +18,6 @@ class User {
      *              id,
      *              username,
      *              picture_url,
-     *              last_on,
      *              joining_date,
      *              is_site_admin,
      *              memberships:[{ id, roleId, nickname, serverId}, ...]
@@ -35,6 +33,7 @@ class User {
                     u.hashed_password AS "password",
                     u.picture_url AS "picture_url",
                     u.joining_date AS "joining_date",
+                    u.last_on AS "last_on",
                     u.is_site_admin AS "is_site_admin",
                     m.id AS "member_id",
                     m.nickname AS "nickname",
@@ -59,6 +58,7 @@ class User {
                 username:result.rows[0].username,
                 picture_url:result.rows[0].picture_url,
                 joining_date:result.rows[0].joining_date,
+                last_on:result.rows[0].last_on,
                 is_site_admin:result.rows[0].is_site_admin,
                 memberships:result.rows[0].member_id ?
                                 result.rows.map( row => {
@@ -79,25 +79,36 @@ class User {
      *
      * data should be { username, password, picture_url }
      *
-     * returns { id, username, picture_url }
+     * returns { id, username, picture_url, joining_date }
      */
 
     static async register( username, password, pictureUrl=null ) {
 
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR)
+        const now = new Date()
 
         const result = await db.query(`
-                INSERT INTO users (username, hashed_password, picture_url)
-                VALUES ($1, $2, $3)
-                RETURN id, username, picture_url
-        `, [username, hashedPassword, pictureUrl])
+                INSERT INTO users (
+                    username,
+                    hashed_password,
+                    picture_url,
+                    joining_date,
+                    last_on
+                )
+                VALUES ($1, $2, $3, $4, $4)
+                RETURNING
+                    id,
+                    username,
+                    picture_url,
+                    joining_date
+        `, [username, hashedPassword, pictureUrl, now])
 
         return result.rows[0]
     }
 
-    /** finds all users with username
+    /** finds with username
      *
-     * returns [{ id, username, picture_url }, ...]
+     * returns { id, username, picture_url, joining_date }
      *
      * throws error if no user exists
      *
@@ -106,19 +117,21 @@ class User {
 
     static async find(username=null) {
 
+        if(username == null) return await User.findAll()
+
         const result = await db.query(`
-                SELECT id, username, picture_url
+                SELECT id, username, picture_url, joining_date
+                FROM users
                 WHERE username = $1
         `, [username])
 
         if( result.rows[0].id ) {
-            return result.rows.map( row => {
-                return {
-                    id:row.id,
-                    username:row.username,
-                    picture_url:row.picture_url
-                }
-            })
+            return {
+                id:result.rows[0].id,
+                username:result.rows[0].username,
+                picture_url:result.rows[0].picture_url,
+                joining_date:result.rows[0].joining_date
+            }
         }
         else throw new NotFoundError("no users with that username found")
     }
@@ -146,7 +159,6 @@ class User {
      *              id,
      *              username,
      *              picture_url,
-     *              last_on,
      *              joining_date,
      *              is_site_admin,
      *              memberships:[{
@@ -172,7 +184,6 @@ class User {
                     u.username AS "username",
                     u.picture_url AS "picture_url",
                     u.joining_date AS "joining_date",
-                    u.last_on AS "last_on",
                     u.is_site_admin AS "is_site_admin",
                     m.id AS "member_id",
                     m.nickname AS "nickname",
@@ -190,8 +201,7 @@ class User {
                 LEFT JOIN roles r
                         ON m.role_id = r.id
                 WHERE u.id = $1
-                ORDER BY mem
-        `)
+        `, [id])
 
         if( !result.rows[0].id ) throw new NotFoundError("no user with that id")
 
@@ -201,6 +211,7 @@ class User {
             id:basicInfo.id,
             username:basicInfo.username,
             picture_url:basicInfo.picture_url,
+            joining_date:basicInfo.joining_date,
             is_site_admin:basicInfo.is_site_admin,
             memberships:result.rows.map( row => {
                 return {
@@ -228,11 +239,11 @@ class User {
 
     static async updateLastOn(id) {
 
-        const time = timeJSToSQL(new Date())
+        const time = new Date()
 
         const result = await db.query(`
                 UPDATE users SET last_on = $1 WHERE id = $2
-                RETURN id, last_on
+                RETURNING id, last_on
         `, [time, id])
 
         return result.rows[0]
@@ -249,8 +260,10 @@ class User {
 
         const result = await db.query(`
                 UPDATE users SET username = $1 WHERE id = $2
-                RETURN id, username
+                RETURNING id, username
        `, [newUsername, id])
+
+       if( !result.rows[0].id ) throw new NotFoundError("user not found")
 
        return result.rows[0]
    }
@@ -268,7 +281,10 @@ class User {
 
         const result = await db.query(`
                 UPDATE users SET password = $1 WHERE id = $2
+                RETURN id
         `, [hashedPassword, id])
+
+        if( !result.rows[0].id ) throw new NotFoundError("user not found")
     }
 
     /** removes user from database
@@ -279,12 +295,28 @@ class User {
     static async remove(id) {
 
         await db.query(`
+                UPDATE reactions SET member_id = 0
+                WHERE member_id = ANY (
+                    SELECT id FROM memberships
+                    WHERE user_id = id
+                )
+        `, [id])
+
+        await db.query(`
+                UPDATE posts SET member_id = 0
+                WHERE member_id = ANY (
+                    SELECT id FROM memberships
+                    WHERE user_id = id
+                )
+        `, [id])
+
+        await db.query(`
                 DELETE FROM memberships WHERE user_id = $1
         `, [id])
 
         const result = await db.query(`
                 DELETE FROM users WHERE id = $1
-                RETURN username, picture_url
+                RETURNING username, picture_url
         `, [id])
 
         if( !result.rows[0].username ) {

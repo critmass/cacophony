@@ -8,23 +8,21 @@ CREATE TABLE "users" (
     "username" varchar   NOT NULL,
     "hashed_password" varchar   NOT NULL,
     "picture_url" varchar   NULL,
-    "joining_date" timestamp [ 4 ]  NOT NULL,
+    "joining_date" timestamp   NOT NULL,
     "last_on" timestamp   NOT NULL,
-    "is_site_admin" boolean NULL,
+    "is_site_admin" boolean   NULL,
     CONSTRAINT "pk_users" PRIMARY KEY (
         "id"
-     ),
-    CONSTRAINT "uc_users_username" UNIQUE (
-        "username"
-    )
+     )
+
 );
 
 CREATE TABLE "servers" (
     "id" SERIAL   NOT NULL,
-    "name" varchar   NOT NULL,
+    "name" varchar   NULL,
     "picture_url" varchar   NULL,
-    "start_date" timestamp [ 5 ]  NOT NULL,
-    "private" boolean   NOT NULL,
+    "start_date" timestamp   NOT NULL,
+    "private" boolean  NULL,
     CONSTRAINT "pk_servers" PRIMARY KEY (
         "id"
      ),
@@ -60,7 +58,7 @@ CREATE TABLE "memberships" (
     "role_id" int   NOT NULL,
     "server_id" int   NOT NULL,
     "nickname" varchar   NOT NULL,
-    "joining_date" timestamp [ 5 ]  NOT NULL,
+    "joining_date" timestamp   NOT NULL,
     "picture_url" varchar NULL,
     CONSTRAINT "pk_memberships" PRIMARY KEY (
         "id"
@@ -88,9 +86,9 @@ CREATE TABLE "access" (
 CREATE TABLE "posts" (
     "id" SERIAL   NOT NULL,
     "room_id" int   NOT NULL,
-    "member_id" int   NOT NULL,
+    "member_id" int   NULL,
     "content" varchar   NOT NULL,
-    "post_date" timestamp   NOT NULL,
+    "post_date" timestamp    NOT NULL,
     "threaded_from" int   NULL,
     CONSTRAINT "pk_posts" PRIMARY KEY (
         "id"
@@ -99,7 +97,7 @@ CREATE TABLE "posts" (
 
 CREATE TABLE "reactions" (
     "post_id" int   NOT NULL,
-    "member_id" int   NOT NULL,
+    "member_id" int   NULL,
     "type" varchar   NOT NULL
 );
 

@@ -4,8 +4,8 @@
 const intToColor = ( colorAsNumber ) => {
 
     const r = Math.floor( colorAsNumber / (256 ** 2) )
-    const b = Math.floor( (colorAsNumber - r) / 256 )
-    const g = colorAsNumber - r - b
+    const b = Math.floor( (colorAsNumber - r * 256 ** 2) / 256 )
+    const g = colorAsNumber - r * 256 ** 2 - b * 256
 
     if( r > 256 || colorAsNumber < 0 ) throw Error("outside bounds")
 
