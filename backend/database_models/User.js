@@ -295,18 +295,18 @@ class User {
     static async remove(id) {
 
         await db.query(`
-                UPDATE reactions SET member_id = 0
+                UPDATE reactions SET member_id = NULL
                 WHERE member_id = ANY (
                     SELECT id FROM memberships
-                    WHERE user_id = id
+                    WHERE user_id = $1
                 )
         `, [id])
 
         await db.query(`
-                UPDATE posts SET member_id = 0
+                UPDATE posts SET member_id = NULL
                 WHERE member_id = ANY (
                     SELECT id FROM memberships
-                    WHERE user_id = id
+                    WHERE user_id = $1
                 )
         `, [id])
 

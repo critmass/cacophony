@@ -10,10 +10,15 @@ class Post {
      *
      * data should be { memberId, roomId, content }
      *
-     * returns { id, memberId, roomId, content, posted_on }
+     * returns { id, member_id, room_id, content, posted_on }
      */
 
-    static async create(memberId, roomId, content, threadedFrom=null);
+    static async create(memberId, roomId, content, threadedFrom=null) {
+
+        const result = db.query(`
+
+        `)
+    };
 
     /** finds all posts to a room at roomId
      *
@@ -22,7 +27,7 @@ class Post {
      *              memberId,
      *              content,
      *              posted_on,
-     *              reactions:{ [type]:[memberId, ...], ...}
+     *              reactions:{ [type]:[member_id, ...], ...}
      *          }, ...]
      */
 
@@ -35,7 +40,7 @@ class Post {
      *              memberId,
      *              content,
      *              posted_on,
-     *              reactions:{ [type]:[memberId, ...], ...}
+     *              reactions:{ [type]:[member_id, ...], ...}
      *          }
      */
 
@@ -48,7 +53,7 @@ class Post {
      *              memberId,
      *              content,
      *              posted_on,
-     *              reactions:{ [type]:[memberId, ...], ...}
+     *              reactions:{ [type]:[member_id, ...], ...}
      *          }
      */
 

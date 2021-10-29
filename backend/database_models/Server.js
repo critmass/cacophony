@@ -250,8 +250,6 @@ class Server {
 
         if (!deletedServerData) throw new NotFoundError("no id found")
 
-        console.log(deletedServerData)
-
         return {
             name: deletedServerData.name,
             picture_url: deletedServerData.picture_url,

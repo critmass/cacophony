@@ -39,14 +39,14 @@ describe("Find Memberships by Server", () => {
 describe("Find Memberships by User", () => {
     it("finds memberships by user id", async () => {
         const members = await Membership.findByUser(1)
-        expect(members.length).toBe(3)
+        expect(members.length).toBe(2)
     })
     it("Throws an error if user doesn't exist", async () => {
         try {
             await Membership.findByUser(5000)
 
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
@@ -61,7 +61,7 @@ describe("Find Memberships by Role", () => {
             await Membership.findByRole(5000)
 
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
@@ -83,41 +83,22 @@ describe("Get Memberships", () => {
         try {
             await Membership.get(5000)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
 
 describe("Create Memberships", () => {
     it("creates a new member", async () => {
-        const member = await Membership.create(1, 7, defaultImgURL)
-        expect(member.id).toBe(9)
-        expect(member.userId).toBe(1)
-        expect(member.serverId).toBe(1)
-        expect(member.roleId).toBe(7)
-        expect(member.pictureURL).toBe(defaultImgURL)
+        const member = await Membership.create(1, 6, defaultImgURL)
+        expect(member.id).toBe(8)
+        expect(member.user_id).toBe(1)
+        expect(member.server_id).toBe(3)
+        expect(member.role.id).toBe(6)
+        expect(member.role.title).toBe('r3n')
+        expect(member.picture_url).toBe(defaultImgURL)
     })
-    it("throws an error if user doesn't exist", async () => {
-        try {
-            await Membership.create(5000, 7, defaultImgURL)
-        } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
-        }
-    })
-    it("throws an error if server doesn't exist", async () => {
-        try {
-            await Membership.create(1, 5000, defaultImgURL)
-        } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
-        }
-    })
-    it("throws an error if user already has a membership on the server", async () => {
-        try {
-            await Membership.create(1, 1, defaultImgURL)
-        } catch (err) {
-            expect(err instanceof BadRequestError).toBeTruthy()
-        }
-    })
+
 })
 
 describe("Update Memberships Nickname", () => {
@@ -130,14 +111,14 @@ describe("Update Memberships Nickname", () => {
         try {
             await Membership.updateNickname(5000, "not_a_member")
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
     it("throws an error if nickname already exists on server", async () => {
         try {
             await Membership.updateNickname(1, "m2")
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
@@ -146,48 +127,48 @@ describe("Update Membership's Role", () => {
     it("updates the role of a membership", async () => {
         const member = await Membership.updateRole(2, 1)
         expect(member.id).toBe(2)
-        expect(member.userId).toBe(2)
-        expect(member.serverId).toBe(1)
-        expect(member.roleId).toBe(1)
+        expect(member.user_id).toBe(2)
+        expect(member.server_id).toBe(1)
+        expect(member.role_id).toBe(1)
         expect(member.nickname).toBe("m2")
-        expect(member.pictureURL).toBe(defaultImgURL)
-        expect(member.joiningDate).toBe(defaultTimeSQL)
+        expect(member.picture_url).toBe(defaultImgURL)
+        expect(member.joining_date).toEqual(defaultTime)
     })
     it("throws an error when membership doesn't exist", async () => {
         try {
             await Membership.updateRole(5000, 1)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
     it("throws an error when role doesn't exist", async () => {
         try {
             await Membership.updateRole(1, 5000)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
     it("throws an error when role and member not on same server", async () => {
         try {
             await Membership.updateRole(1, 5)
         } catch (err) {
-            expect(err instanceof BadRequestError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
 
 describe("Remove Membership", () => {
     it("it removes a membership", async () => {
-        const removedMember = Membership.remove(1)
-        expect(removedMember.userId).toBe(1)
-        expect(removedMember.serverId).toBe(1)
-        expect(removedMember.roleId).toBe(1)
+        const removedMember = await Membership.remove(1)
+        expect(removedMember.user_id).toBe(1)
+        expect(removedMember.server_id).toBe(1)
+        expect(removedMember.role_id).toBe(1)
     })
     it("throws an error if membership id doesn't exist", async () => {
         try {
             await Membership.remove(5000)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })

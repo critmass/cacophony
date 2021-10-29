@@ -80,8 +80,6 @@ const commonBeforeAll = async () => {
             (1, 4, 2, 'm4', $1, $2),
             (2, 3, 2, 'a5', $1, $2),
             (3, 4, 2, 'm6', $1, $2),
-            (1, 6, 3, 'm7', $1, $2),
-            (2, 6, 3, 'm8', $1, $2),
             (3, 5, 3, 'a9', $1, $2)
     `, [defaultTime, defaultImgURL])
     await db.query(`

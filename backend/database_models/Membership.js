@@ -33,15 +33,24 @@ class Membership {
         const user = await User.get(userId)
         if(!picture_url) picture_url = user.picture_url
 
+        const serverResult = await db.query(`
+                SELECT server_id as "id"
+                FROM roles
+                WHERE id = $1
+        `,[roleId])
+
+        const serverInfo = serverResult.rows[0]
+
         const memberResult = await db.query(`
                 INSERT INTO memberships (
                     user_id,
                     role_id,
                     picture_url,
                     nickname,
-                    joining_date
+                    joining_date,
+                    server_id
                 )
-                VALUES ($1, $2, $3, $4, $5)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING
                     id,
                     user_id,
@@ -49,7 +58,14 @@ class Membership {
                     role_id,
                     server_id,
                     picture_url
-        `, [userId, roleId, picture_url, user.username, now])
+        `, [
+            userId,
+            roleId,
+            picture_url,
+            user.username,
+            now,
+            serverInfo.id
+        ])
 
         const roleResult = await db.query(`
                 SELECT id, is_admin, title
@@ -293,7 +309,7 @@ class Membership {
 
     /** Updates the member's nickname
      *
-     * returns {id, server_id, role_id, nickname}
+     * returns {id, user_id, server_id, role_id, nickname}
      */
 
     static async updateNickname(id, newName) {
@@ -301,7 +317,7 @@ class Membership {
         const result = await db.query(`
                 UPDATE memberships SET nickname = $2
                 WHERE id = $1
-                RETURNING id, server_id, role_id, nickname
+                RETURNING id, user_id, server_id, role_id, nickname
         `, [id, newName])
 
         return {...result.rows[0]}
@@ -309,7 +325,15 @@ class Membership {
 
     /** Updates the member's roles
      *
-     * returns {id, server_id, role_id, nickname}
+     * returns {
+     *              id,
+     *              server_id,
+     *              user_id,
+     *              role_id,
+     *              nickname,
+     *              picture_url,
+     *              joining_date
+     *          }
      */
 
     static async updateRole(id, newRoleId) {
@@ -317,7 +341,14 @@ class Membership {
         const result = await db.query(`
                 UPDATE memberships SET role_id = $2
                 WHERE id = $1
-                RETURNING id, server_id, role_id, nickname
+                RETURNING
+                    id,
+                    server_id,
+                    user_id,
+                    role_id,
+                    nickname,
+                    picture_url,
+                    joining_date
         `, [id, newRoleId])
 
         return {...result.rows[0]}
@@ -325,7 +356,7 @@ class Membership {
 
     /** Removes membership with given id
      *
-     * returns {server_id, role_id, nickname}
+     * returns {server_id, user_id, role_id, nickname}
      */
 
     static async remove(id) {
@@ -341,8 +372,8 @@ class Membership {
         `, [id])
 
         const result = await db.query(`
-                DELETE FROM memberships WHERE user_id = $1
-                RETURNING server_id, role_id, nickname
+                DELETE FROM memberships WHERE id = $1
+                RETURNING server_id, user_id, role_id, nickname
         `, [id])
 
         return {...result.rows[0]}
@@ -350,3 +381,4 @@ class Membership {
 }
 
 module.exports = Membership
+
