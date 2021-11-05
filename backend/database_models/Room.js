@@ -15,7 +15,7 @@ class Room {
 
     static async create(name, serverId, type="text") {
 
-        const result = db.query(`
+        const result = await db.query(`
                 INSERT INTO rooms (
                     name, server_id, type
                 )
@@ -35,7 +35,7 @@ class Room {
 
     static async find(serverId) {
 
-        const result = db.query(`
+        const result = await db.query(`
                 SELECT id, name, server_id, type
                 FROM rooms WHERE server_id = $1
         `, [serverId])
@@ -66,7 +66,7 @@ class Room {
 
     static async get(id) {
 
-        const result = db.query(`
+        const result = await db.query(`
                 SELECT
                     r.id AS "id",
                     r.name AS "name",
@@ -103,17 +103,59 @@ class Room {
             type:result.rows[0].type
         }
 
-        const members =
+        const posts = result.rows.reduce( (postMap, row) => {
+
+            if(row.post_id) {
+
+                if(postMap.has(row.post_id)) {
+
+                    postMap
+                        .get(row.post_id)
+                        .reactions[row.react_type]
+                        .push(row.react_member_id)
+                }
+                else {
+                    postMap.set(row.post_id, {
+                        contents:row.contents,
+                        poster_id:row.poster_id,
+                        post_date:row.post_date,
+                        threaded_from:row.threaded_from,
+                        reactions:{
+                            [row.react_type]:[row.react_member_id]
+                        }
+                    })
+                }
+            }
+            return postMap
+
+        }, new Map())
+
+        const members = result.rows.reduce( (memberList, row) => {
+
+            if(row.member_id) memberList.push({
+                user_id:row.user_id,
+                role_id:row.role_id,
+                is_moderator:row.is_moderator
+            })
+
+            return memberList
+        }, [])
+
+        return {
+            ...roomInfo,
+            members:[...members],
+            posts:[...posts.entries()].map( post => {
+                return { ...post[1], id:post[0] }
+            })
+        }
     };
 
     /** Removes room with id from database, returns the room data
      *
      * returns {
-     *              id,
      *              name,
      *              server_id,
      *              type,
-     *              members: [{member_id, user_id, role_id, is_moderator}, ...],
      *              posts: [{
      *                          id,
      *                          content,
@@ -125,7 +167,60 @@ class Room {
      *          }
      */
 
-    static async remove(id);
+    static async remove(id) {
+
+        await db.query(`DELETE FROM access WHERE room_id = $1 `, [id])
+
+        const reactResult = await db.query(`
+                    DELETE FROM reactions
+                    WHERE post_id = ANY (
+                        SELECT id FROM posts WHERE room_id = $1
+                    )
+                    RETURNING type, member_id, post_id
+        `, [id])
+
+        const postResult = await db.query(`
+                    DELETE FROM posts
+                    WHERE room_id = $1
+                    RETURNING
+                        id,
+                        content,
+                        member_id AS "poster_id",
+                        post_date,
+                        threaded_from
+        `, [id])
+
+        const posts = postResult.rows.map( row => {
+
+            return {
+                ...row,
+                reactions:reactResult.rows.reduce( (reactObj, reaction) => {
+                    if( reaction.post_id === row.id ) {
+
+                        if( reactObj[reaction.type] ) {
+                            reactObj[reaction.type] = [reaction.member_id]
+                        }
+                        else {
+                            reactObj[reaction.type].push(reaction.member_id)
+                        }
+                    }
+                }, {})
+            }
+        })
+
+        const roomResult = await db.query(`
+                    DELETE FROM rooms
+                    WHERE id = $1
+                    RETURNING name, server_id, type
+        `, [id])
+
+        const roomInfo = roomResult.rows[0]
+
+        return {
+            ...roomInfo,
+            posts:[...posts]
+        }
+    };
 }
 
 module.exports = Room

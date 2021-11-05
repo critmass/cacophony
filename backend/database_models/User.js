@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const db = require("../db")
 const { BCRYPT_WORK_FACTOR } = require("../config");
 const { UnauthorizedError, NotFoundError } = require("../expressError");
+const { sqlForPartialUpdate } = require("../helpers/sql");
 
 
 
@@ -49,7 +50,8 @@ class User {
             throw new UnauthorizedError("user id not found")
         }
 
-        const rightPassword = await bcrypt.compare(password, result.rows[0].password)
+        const rightPassword =
+                await bcrypt.compare(password, result.rows[0].password)
 
         if(rightPassword) {
 
@@ -75,16 +77,23 @@ class User {
         else throw new UnauthorizedError("bad password")
     }
 
-    /** Registers a user from the data provided
+    /** Creates a user from the data provided
      *
      * data should be { username, password, picture_url }
      *
-     * returns { id, username, picture_url, joining_date }
+     * returns { id, username, picture_url, joining_date, is_site_admin }
      */
 
-    static async register( username, password, pictureUrl=null ) {
+    static async create(
+                    username,
+                    password,
+                    pictureUrl=null,
+                    isSiteAdmin=null
+    ) {
 
-        const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR)
+        const hashedPassword = await bcrypt.hash(
+                                                password,
+                                                BCRYPT_WORK_FACTOR )
         const now = new Date()
 
         const result = await db.query(`
@@ -92,23 +101,25 @@ class User {
                     username,
                     hashed_password,
                     picture_url,
+                    is_site_admin,
                     joining_date,
                     last_on
                 )
-                VALUES ($1, $2, $3, $4, $4)
+                VALUES ($1, $2, $3, $5, $4, $4)
                 RETURNING
                     id,
                     username,
                     picture_url,
-                    joining_date
-        `, [username, hashedPassword, pictureUrl, now])
+                    joining_date,
+                    is_site_admin
+        `, [username, hashedPassword, pictureUrl, now, isSiteAdmin])
 
         return result.rows[0]
     }
 
     /** finds with username
      *
-     * returns { id, username, picture_url, joining_date }
+     * returns { id, username, picture_url, last_on }
      *
      * throws error if no user exists
      *
@@ -120,7 +131,7 @@ class User {
         if(username == null) return await User.findAll()
 
         const result = await db.query(`
-                SELECT id, username, picture_url, joining_date
+                SELECT id, username, picture_url, last_on
                 FROM users
                 WHERE username = $1
         `, [username])
@@ -130,7 +141,7 @@ class User {
                 id:result.rows[0].id,
                 username:result.rows[0].username,
                 picture_url:result.rows[0].picture_url,
-                joining_date:result.rows[0].joining_date
+                last_on:result.rows[0].last_on
             }
         }
         else throw new NotFoundError("no users with that username found")
@@ -138,13 +149,13 @@ class User {
 
     /** finds all users
      *
-     * returns [{id, username, picture_url}, ...]
+     * returns [{id, username, picture_url, last_on}, ...]
      */
 
     static async findAll() {
 
         const result = await db.query(`
-                SELECT id, username, picture_url
+                SELECT id, username, picture_url, last_on
                 FROM users
         `)
 
@@ -160,6 +171,7 @@ class User {
      *              username,
      *              picture_url,
      *              joining_date,
+     *              last_on,
      *              is_site_admin,
      *              memberships:[{
      *                      id,
@@ -169,7 +181,7 @@ class User {
      *                          name,
      *                          picture_url
      *                      },
-     *                      role:{ id, title, color },
+     *                      role:{ id, title, color }
      *              }, ...]
      *          }
      *
@@ -185,6 +197,7 @@ class User {
                     u.picture_url AS "picture_url",
                     u.joining_date AS "joining_date",
                     u.is_site_admin AS "is_site_admin",
+                    u.last_on AS "last_on",
                     m.id AS "member_id",
                     m.nickname AS "nickname",
                     s.id AS "server_id",
@@ -203,7 +216,8 @@ class User {
                 WHERE u.id = $1
         `, [id])
 
-        if( !result.rows[0].id ) throw new NotFoundError("no user with that id")
+        if( !result.rows[0].id ) throw new
+                            NotFoundError("no user with that id")
 
         const basicInfo = result.rows[0]
 
@@ -212,6 +226,7 @@ class User {
             username:basicInfo.username,
             picture_url:basicInfo.picture_url,
             joining_date:basicInfo.joining_date,
+            last_on:basicInfo.last_on,
             is_site_admin:basicInfo.is_site_admin,
             memberships:result.rows.map( row => {
                 return {
@@ -251,41 +266,43 @@ class User {
 
     /** Updates the username of user with id to newUsername
      *
-     * returns {id, username}
+     * returns {id, {username, is_site_admin}}
      *
      * throws error if id not found
     */
 
-    static async changeUsername(id, newUsername) {
+    static async update(
+                    id,
+                    {username=null, pictureUrl=null, isSiteAdmin=null}
+    ) {
 
-        const result = await db.query(`
-                UPDATE users SET username = $1 WHERE id = $2
-                RETURNING id, username
-       `, [newUsername, id])
+        const data = {id, username, pictureUrl, isSiteAdmin}
 
-       if( !result.rows[0].id ) throw new NotFoundError("user not found")
+        const {setCols, values} = sqlForPartialUpdate(
+            data, {
+                id:"id",
+                username:"username",
+                pictureUrl:"picture_url",
+                isSiteAdmin:"is_site_admin"
+        })
 
-       return result.rows[0]
-   }
+        const query = `
+                        UPDATE users
+                        SET ${setCols}
+                        WHERE id = $1
+                        RETURNING
+                            id,
+                            username,
+                            is_site_admin,
+                            last_on`
 
-    /** Updates the username of user with id to newUsername
-     *
-     * returns undefined
-     *
-     * throws error if id not found
-    */
+        const result = await db.query(query, [...values])
 
-    static async changePassword(id, newPassword) {
+        if( !result.rows[0] ) throw new NotFoundError("id not found")
 
-        const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_WORK_FACTOR)
-
-        const result = await db.query(`
-                UPDATE users SET password = $1 WHERE id = $2
-                RETURN id
-        `, [hashedPassword, id])
-
-        if( !result.rows[0].id ) throw new NotFoundError("user not found")
+        return {...result.rows[0]}
     }
+
 
     /** removes user from database
      *

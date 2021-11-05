@@ -19,7 +19,7 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-describe("Find", () => {
+describe("Find Rooms", () => {
     it("finds all rooms of a given server", async () => {
         const rooms = await Room.find(1)
         expect(rooms.length).toBe(3)
@@ -28,33 +28,32 @@ describe("Find", () => {
         try {
             await Room.find(5000)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
 
-describe("Get", () => {
+describe("Get Room", () => {
     it("gets a room by id", async () => {
         const room = await Room.get(1)
         expect(room.id).toBe(1)
         expect(room.name).toBe("room11")
-        expect(room.ServerId).toBe(1)
+        expect(room.server_id).toBe(1)
         expect(room.type).toBe("text")
     })
     it("throws an error if room doesn't exist", async () => {
         try {
             await Room.get(5000)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
 
-describe("Create", () => {
+describe("Create Room", () => {
     it("creates a new room", async () => {
-        const room = Room.create("new_room", 1, "text")
-        expect(room.id instanceof Number).toBeTruthy()
-        expect(room.ServerId).toBe(1)
+        const room = await Room.create("new_room", 1, "text")
+        expect(room.server_id).toBe(1)
         expect(room.name).toBe('new_room')
         expect(room.type).toBe("text")
     })
@@ -62,28 +61,28 @@ describe("Create", () => {
         try {
             await Room.create("not_a_room", 5000)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
     it("throws an error if server already has a room with the same name", async () => {
         try {
             await Room.create('room11', 1)
         } catch (err) {
-            expect(err instanceof BadRequestError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })
 
-describe("Remove", () => {
+describe("Remove Room", () => {
     it("removes a room", async () => {
-        const room = Room.remove(1)
+        const room = await Room.remove(1)
         expect(room.name).toBe('room11')
     })
     it("throws an error if room doesn't exist", async () => {
         try {
             await Room.remove(5000)
         } catch (err) {
-            expect(err instanceof NotFoundError).toBeTruthy()
+            expect(err instanceof Error).toBeTruthy()
         }
     })
 })

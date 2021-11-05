@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../db");
+const { intToColor } = require("../helpers/colorConverter");
 const User = require("./User");
 
 /** Related functions for users */
@@ -97,7 +98,7 @@ class Membership {
      *              id,
      *              nickname,
      *              user_id,
-     *              role:{id, title, color, is_admin},
+     *              role:{id, title, color:{r, b, g}, is_admin},
      *              isadmin,
      *              picture_url
      *      }, ...]
@@ -130,7 +131,7 @@ class Membership {
                     id:row.role_id,
                     title:row.title,
                     is_admin:row.is_admin,
-                    color:row.color
+                    color:intToColor(row.color)
                 }
             }
         })
@@ -142,7 +143,7 @@ class Membership {
      *              id,
      *              nickname,
      *              server_id,
-     *              role:{id, title, color, is_admin},
+     *              role:{id, title, color:{r, b, g}, is_admin},
      *              picture_url
      *      }, ...]
     */
@@ -175,7 +176,7 @@ class Membership {
                     id: row.role_id,
                     title: row.title,
                     is_admin: row.is_admin,
-                    color: row.color
+                    color: intToColor(row.color)
                 }
             }
         })
@@ -245,7 +246,7 @@ class Membership {
      *                      id,
      *                      is_admin,
      *                      title,
-     *                      color,
+     *                      color:{r, b, g},
      *                      access:[{
      *                              room_id,
      *                              room_name,
@@ -294,7 +295,7 @@ class Membership {
                 id: membershipInfo.role_id,
                 is_admin: membershipInfo.is_admin,
                 title: membershipInfo.title,
-                color: membershipInfo.color,
+                color: intToColor(membershipInfo.color),
                 access: result.rows.map( row => {
 
                     return {

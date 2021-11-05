@@ -7,13 +7,11 @@ const Server = require("../../database_models/Server")
 const User = require("../../database_models/User")
 
 const db = require("../../db")
-const { timeJSToSQL } = require("../../helpers/timeConverter")
 
 const defaultImgURL = "https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg"
-const defaultTimeJS = new Date(2024, 10, 1, 12, 43, 55, 0)
-const defaultTimeSQL = timeJSToSQL(defaultTimeJS)
-const defaultColor1 = { r:255, b:255, g:0 }
-const defaultColor2 = { r:0, b:0, g:255 }
+const defaultTime = new Date(2024, 10, 1, 12, 43, 55, 0)
+const defaultColor1 = { r:255, b:255, g:0   }
+const defaultColor2 = { r:0,   b:0,   g:255 }
 
 const commonBeforeAll = async () => {
 
@@ -92,5 +90,5 @@ const commonAfterAll = async () => {
 
 module.exports = {
     commonAfterAll, commonAfterEach, commonBeforeAll, commonBeforeEach,
-    defaultTimeSQL, defaultImgURL,   defaultColor1,   defaultColor2
+    defaultTime, defaultImgURL,   defaultColor1,   defaultColor2
 }

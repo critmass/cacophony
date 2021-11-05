@@ -8,29 +8,63 @@ const express = require("express");
 const {
     ensureLoggedIn,
     ensureIsSiteAdmin,
-    ensureLoggedInOrSiteAdmin
+    ensureSiteAdminOrCurrentUser
 } = require("../middleware/auth");
 const {
     BadRequestError,
-    UnauthorizedError
+    NotFoundError
 } = require("../expressError");
-const User = require("../models/user");
+const userNewSchema = require("../json_schema/");
+const userUpdateSchema = require("../json_schema/");
+const User = require("../database_models/user");
 const { createToken } = require("../helpers/tokens");
-const userNewSchema = require("../json_schemas/userNew.json");
-const userUpdateSchema = require("../json_schemas/userUpdate.json");
 
 const router = express.Router();
 
-/** POST / {user} => { user, token }
+/** POST / {username, } => {
+ *                              user:{
+ *                                  id,
+ *                                  username,
+ *                                  picture_url,
+ *                                  joining_date,
+ *                                  is_site_admin
+ *                              }
+ *                          }
  *
  * Add a new user
 */
 
-router.post("/", async (req, res, next) => {})
+router.post("/", ensureIsSiteAdmin, async (req, res, next) => {
+
+    try{
+        const validator = jsonschema.validate(req.body, userNewSchema)
+        if(validator.valid){
+            const errs = validator.errors.map(e => e.stack);
+            throw new BadRequestError(errs);
+        }
+
+        const user = await User.create(...req.body)
+
+        return res.status(201).json({user})
+    }
+    catch(err) {
+        return next(err)
+    }
+
+})
 
 /** GET / => {users:[{id, username, picture_url, last_on},...]} */
 
-router.get("/", async (req, res, next) => {})
+router.get("/", ensureLoggedIn, async (req, res, next) => {
+
+    try{
+        const users = await User.findAll()
+        if(!users.length) throw new NotFoundError("no users")
+        else res.status(200).json({users})
+    } catch(err){
+        return next(err)
+    }
+})
 
 /** GET /[userId] => {user:{
  *                      id,
@@ -41,20 +75,68 @@ router.get("/", async (req, res, next) => {})
  *                      is_site_admin,
  *                      memberships:[{
  *                          membership_id,
- *                          server_id,
- *                          server_name,
- *                          server_picture_id
+ *                          nickname,
+ *                          role:{id, title, color},
+ *                          server:{id, name, picture_url}
  *                      }, ...]
- *                  }} */
+ *                  }}
+ * */
 
-router.get("/:userId", async (req, res, next) => {})
+router.get("/:userId", ensureSiteAdminOrCurrentUser, async (req, res, next) => {
 
-/** PATCH /[userId] {user} => {user} */
+    try {
+        const user = User.get(req.params.userId)
+        if(!user.id) throw new NotFoundError("no user found")
 
-router.patch("/:userId", async (req, res, next) => {})
+        return res.status(200).json({user})
 
-/** DELETE /[userId] => {user:{id, username, picture_url, joining_date, last_on}} */
+    } catch (err) {
+        return next(err)
+    }
+})
 
-router.delete("/:userId", async (req, res, next) => {})
+/** PATCH /[userId] {user} => {user}
+*/
+
+router.patch(
+    "/:userId",
+    ensureSiteAdminOrCurrentUser,
+    async (req, res, next) => {
+
+        try {
+            const validator = jsonschema.validate(
+                                            req.body,
+                                            userUpdateSchema)
+            if(!validator.valid) throw new BadRequestError()
+
+            const user = await User.update(req.params.userId)
+            return res.status(201).json({user})
+        }
+        catch (err) {
+            next(err)
+        }
+})
+
+/** DELETE /[userId] => {user:{
+ *                              id,
+ *                              username,
+ *                              picture_url,
+ *                              joining_date,
+ *                              last_on
+ *                      }}
+ * */
+
+router.delete(
+    "/:userId",
+    ensureSiteAdminOrCurrentUser,
+    async (req, res, next) => {
+
+        try {
+            const user = await User.remove(req.params.userId)
+            return res.status(200).json({user})
+        } catch (error) {
+            next(error)
+        }
+})
 
 module.exports = router
