@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 const db = require("../db")
 const { BCRYPT_WORK_FACTOR } = require("../config");
-const { UnauthorizedError, NotFoundError } = require("../expressError");
+const { UnauthorizedError, NotFoundError, BadRequestError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 
@@ -25,7 +25,7 @@ class User {
      *          }
      */
 
-    static async authenticate(id, password) {
+    static async authenticate(username, password) {
 
         const result = await db.query(`
                 SELECT
@@ -43,11 +43,11 @@ class User {
                 FROM users u
                 LEFT JOIN memberships m
                         ON u.id = m.user_id
-                WHERE u.id = $1
-        `, [id])
+                WHERE u.username = $1
+        `, [username])
 
         if( !result.rows.length ) {
-            throw new UnauthorizedError("user id not found")
+            throw new UnauthorizedError("username not found")
         }
 
         const rightPassword =
@@ -67,8 +67,8 @@ class User {
                                     return {
                                         id:row.member_id,
                                         nickname:row.nickname,
-                                        server_id:row.server_id,
-                                        role_id:row.role_id
+                                        serverId:row.server_id,
+                                        roleId:row.role_id
                                     }
                                 }):
                                 []
@@ -84,12 +84,16 @@ class User {
      * returns { id, username, picture_url, joining_date, is_site_admin }
      */
 
-    static async create(
+    static async create({
                     username,
                     password,
                     pictureUrl=null,
-                    isSiteAdmin=null
-    ) {
+                    isSiteAdmin=false
+    }) {
+
+        if(username === undefined || password === undefined ) {
+            throw new BadRequestError("username or password not provided")
+        }
 
         const hashedPassword = await bcrypt.hash(
                                                 password,
@@ -271,32 +275,36 @@ class User {
      * throws error if id not found
     */
 
-    static async update(
-                    id,
-                    {username=null, pictureUrl=null, isSiteAdmin=null}
-    ) {
-
-        const data = {id, username, pictureUrl, isSiteAdmin}
+    static async update(data) {
 
         const {setCols, values} = sqlForPartialUpdate(
-            data, {
+            {
+                username:data.username,
+                pictureUrl:data.pictureUrl,
+                isSiteAdmin:data.isSiteAdmin
+            }, {
                 id:"id",
                 username:"username",
                 pictureUrl:"picture_url",
                 isSiteAdmin:"is_site_admin"
         })
 
+        console.log(`${Object.entries(data)}:::${values}:::${setCols}`)
+
         const query = `
                         UPDATE users
                         SET ${setCols}
-                        WHERE id = $1
+                        WHERE id = $${values.length + 1}
                         RETURNING
                             id,
                             username,
                             is_site_admin,
                             last_on`
 
-        const result = await db.query(query, [...values])
+        console.log(`${query}
+        [${values}]`)
+
+        const result = await db.query(query, [...values, data.id])
 
         if( !result.rows[0] ) throw new NotFoundError("id not found")
 

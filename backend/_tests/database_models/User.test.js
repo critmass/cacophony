@@ -23,7 +23,7 @@ afterAll(commonAfterAll);
 
 describe("Authenticate User", () => {
     it("works to log someone in", async () => {
-        const user = await User.authenticate(1, 'password1')
+        const user = await User.authenticate('u1', 'password1')
         expect(user.username).toBe('u1')
         expect(user.picture_url).toBe(defaultImgURL)
         expect(user.joining_date).toEqual(defaultTime)
@@ -98,20 +98,21 @@ describe("Get User", () => {
 describe("Create User", () => {
     const newUser = {
         username: 'newUser',
-        picture_url: defaultImgURL
+        password:"newPassword",
+        pictureUrl: defaultImgURL
     }
     it("works to sign someone up", async () => {
-        const user = await User.create(
-            newUser.username,
-            "password",
-            newUser.picture_url
-        )
+        const user = await User.create(newUser)
         expect(user.username).toBe(newUser.username)
-        expect(user.picture_url).toBe(newUser.picture_url)
+        expect(user.picture_url).toBe(newUser.pictureUrl)
     })
     it("doesn't let you create the same username twice", async () => {
         try {
-            const user = await User.create('u1', 'password', picture_url)
+            const user = await User.create({
+                username:'u1',
+                password:'password',
+                pictureUrl:defaultImgURL
+            })
             fail()
         }
         catch(err) {
@@ -122,17 +123,17 @@ describe("Create User", () => {
 
 describe("Update User", () => {
     it("changes the username", async () => {
-        const user = await User.update(1, {username:"newU1"})
+        const user = await User.update( {id:1, username:"newU1"})
         expect(user.username).toBe("newU1")
     })
     it("changes the site admin status", async () => {
-        const user = await User.update(1, {isSiteAdmin:true})
+        const user = await User.update({id:1, isSiteAdmin:true})
         expect(user.username).toBe("u1")
         expect(user.is_site_admin).toBeTruthy()
     })
     it("can't change a username to an existing username", async () => {
         try {
-            await User.update(1, {username:"u2"})
+            await User.update({id:1, username:"u2"})
             fail()
         }
         catch(err) {
@@ -141,7 +142,7 @@ describe("Update User", () => {
     })
     it("can't change a username to an existing username", async () => {
         try {
-            await User.update(5000, {username:"newestUsername"})
+            await User.update({id:5000, username:"newestUsername"})
             fail()
         }
         catch(err) {

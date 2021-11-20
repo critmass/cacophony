@@ -47,7 +47,7 @@ const ensureLoggedIn = (req, res, next) => {
 
 const ensureIsSiteAdmin = (req, res, next) => {
   try {
-    if (!res.locals.user || !res.locals.user.isAdmin) {
+    if (!res.locals.user || !res.locals.user.isSiteAdmin) {
       throw new UnauthorizedError();
     }
     return next();

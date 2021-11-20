@@ -13,7 +13,10 @@ CREATE TABLE "users" (
     "is_site_admin" boolean   NULL,
     CONSTRAINT "pk_users" PRIMARY KEY (
         "id"
-     )
+    ),
+    CONSTRAINT "pk_users_username" UNIQUE (
+        "username"
+    )
 
 );
 

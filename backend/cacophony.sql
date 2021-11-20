@@ -1,3 +1,4 @@
+;
 DROP DATABASE cacophony;
 CREATE DATABASE cacophony;
 

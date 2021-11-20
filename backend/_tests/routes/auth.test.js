@@ -1,5 +1,7 @@
 "use strict";
 
+const request = require("supertest")
+
 const {
     commonBeforeAll,
     commonBeforeEach,
@@ -21,8 +23,8 @@ describe("POST /auth/token", () => {
             const resp = await request(app)
                 .post("/auth/token")
                 .send({
-                    username: "u1",
-                    password: "password1",
+                    username: "user1",
+                    password: "password1"
                 });
             expect(resp.body).toEqual({
                 "token": expect.any(String),
@@ -41,7 +43,7 @@ describe("POST /auth/token", () => {
         const resp = await request(app)
             .post("/auth/token")
             .send({
-                username: "u1",
+                username: "user1",
                 password: "nope",
             });
         expect(resp.statusCode).toEqual(401);
@@ -50,7 +52,7 @@ describe("POST /auth/token", () => {
         const resp = await request(app)
             .post("/auth/token")
             .send({
-                username: "u1",
+                username: "user1",
             });
         expect(resp.statusCode).toEqual(400);
     })

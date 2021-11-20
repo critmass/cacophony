@@ -11,7 +11,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 
   // {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
   const cols = keys.reduce( (reducedKeys, key) => {
-    if(dataToUpdate[key] != null) reducedKeys.push(key)
+    if(dataToUpdate[key] != undefined) reducedKeys.push(key)
     return reducedKeys
   },[]).map((colName, idx) =>
             `"${jsToSql[colName] || colName}"=$${idx + 1}`,
@@ -20,7 +20,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   return {
     setCols: cols.join(", "),
     values: Object.values(dataToUpdate).reduce( (updatedData, val) => {
-      if(val !== null) updatedData.push(val)
+      if(val !== undefined) updatedData.push(val)
       return updatedData
     },[]),
   };

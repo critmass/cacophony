@@ -74,7 +74,7 @@ router.patch("/:serverId", async (req, res, next) => {})
 router.delete("/:serverId", async (req, res, next) => {})
 
 router.post("/:serverId/rooms", ensureLoggedIn, createRoom)
-router.get("/:serverId/rooms", , getRooms)
+router.get("/:serverId/rooms", getRooms)
 router.get("/:serverId/rooms/:roomId",  getRoom)
 router.patch("/:serverId/rooms/:roomId", patchRoom)
 router.delete("/:serverId/rooms/:roomId", deleteRoom)

@@ -193,8 +193,6 @@ class Post {
             threaded_from:result.rows[0].threaded_from
         }
 
-        console.log( {...postInfo, reactions} )
-
         return { ...postInfo, reactions }
     };
 }

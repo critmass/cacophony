@@ -14,10 +14,10 @@ const {
     BadRequestError,
     NotFoundError
 } = require("../expressError");
-const userNewSchema = require("../json_schema/");
-const userUpdateSchema = require("../json_schema/");
+const jwt = require("jsonwebtoken")
+const userNewSchema = require("../json_schema/userNew.json");
+const userUpdateSchema = require("../json_schema/userUpdate.json");
 const User = require("../database_models/user");
-const { createToken } = require("../helpers/tokens");
 
 const router = express.Router();
 
@@ -38,12 +38,13 @@ router.post("/", ensureIsSiteAdmin, async (req, res, next) => {
 
     try{
         const validator = jsonschema.validate(req.body, userNewSchema)
-        if(validator.valid){
+        if(!validator.valid){
             const errs = validator.errors.map(e => e.stack);
+
             throw new BadRequestError(errs);
         }
 
-        const user = await User.create(...req.body)
+        const user = await User.create(req.body)
 
         return res.status(201).json({user})
     }
@@ -85,7 +86,8 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
 router.get("/:userId", ensureSiteAdminOrCurrentUser, async (req, res, next) => {
 
     try {
-        const user = User.get(req.params.userId)
+        const user = await User.get(req.params.userId)
+
         if(!user.id) throw new NotFoundError("no user found")
 
         return res.status(200).json({user})
@@ -107,9 +109,25 @@ router.patch(
             const validator = jsonschema.validate(
                                             req.body,
                                             userUpdateSchema)
+
             if(!validator.valid) throw new BadRequestError()
 
-            const user = await User.update(req.params.userId)
+            /**
+             * this is to ensure that only a current site admin
+             * can update a user's site admin status
+             * */
+
+            const isSiteAdmin = res.locals.user.isSiteAdmin?
+                                    req.body.isSiteAdmin :
+                                    null
+
+
+            const user = await User.update({
+                                    ...req.body,
+                                    isSiteAdmin,
+                                    id:Number(req.params.userId)
+            })
+
             return res.status(201).json({user})
         }
         catch (err) {

@@ -29,7 +29,7 @@ router.post("/token", async (req, res, next) => {
             throw new BadRequestError(errs);
         }
 
-        const { userId, password } = req.body;
+        const { username, password } = req.body;
         const user = await User.authenticate(username, password);
 
         const token = createToken(user);
@@ -61,9 +61,7 @@ router.post("/register", async function (req, res, next) {
             throw new BadRequestError(errs);
         }
 
-        const newUser = await User.create(
-            { ...req.body, isSiteAdmin: false }
-        );
+        const newUser = await User.create(req.body);
         const token = createToken(newUser);
 
         return res.status(201).json({ token });

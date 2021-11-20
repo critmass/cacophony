@@ -15,11 +15,11 @@
             "minLength":6,
             "maxLength":32
         },
-        "pictureUrl":{
+        "picture_url":{
             "type":"string"
         },
-        "isSiteAdmin":{
-            "type":""
+        "is_site_admin":{
+            "type":"boolean"
         }
     }
 }

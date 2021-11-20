@@ -1,17 +1,15 @@
 {
     "type":"object",
     "required":[
-        "user_id",
+        "username",
         "password"
     ],
     "properties":{
-        "user_id":{
-            "type":"integer"
+        "username":{
+            "type":"string"
         },
         "password":{
-            "type":"string",
-            "minLength":6,
-            "maxLength":32
+            "type":"string"
         }
     }
 }
