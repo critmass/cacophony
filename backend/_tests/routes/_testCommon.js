@@ -35,6 +35,18 @@ const commonBeforeAll = async () => {
         pictureUrl:defaultImgURL,
         isSiteAdmin:true
     }) //ID:3
+    await User.create({
+        username:"user4",
+        password:"password1",
+        pictureUrl:defaultImgURL,
+        isSiteAdmin:false
+    }) //ID:4
+    await User.create({
+        username:"user5",
+        password:"password1",
+        pictureUrl:defaultImgURL,
+        isSiteAdmin:true
+    }) //ID:5
 
     await Server.create("server1", defaultImgURL) //ID:1
     await Server.create("server2", defaultImgURL) //ID:2
@@ -91,9 +103,11 @@ const commonAfterAll = async () => {
 const user1Token = createToken({id:1, username:"user1"})
 const user2Token = createToken({id:2, username:"user2"})
 const user3Token = createToken({id:3, username:"user3", isSiteAdmin:true})
+const user4Token = createToken({id:4, username:"user4"})
+const user5Token = createToken({id:5, username:"user5", isSiteAdmin:true})
 
 module.exports = {
     commonAfterAll, commonAfterEach, commonBeforeAll, commonBeforeEach,
     defaultTime, defaultImgURL,   defaultColor1,   defaultColor2,
-    user1Token, user2Token, user3Token
+    user1Token, user2Token, user3Token, user4Token, user5Token
 }

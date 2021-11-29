@@ -2,9 +2,7 @@
 
 const request = require("supertest");
 
-const db = require("../../db");
 const app = require("../../app");
-const User = require("../../routes/users");
 const {
     commonBeforeAll,
     commonBeforeEach,
@@ -41,8 +39,8 @@ describe("POST /users", () => {
                 expect(resp.status).toBe(201)
     })
     it(
-        "should send fail code 401 when someone" +
-        "who isn't a site admin tries to create" +
+        "should send fail code 401 when someone " +
+        "who isn't a site admin tries to create " +
         "a new user",
         async () => {
             const resp = await request(app)
@@ -137,7 +135,7 @@ describe("PATCH /users/:userId", () => {
                         .set("authorization", `Bearer ${user1Token}`)
 
         expect(resp.status).toBe(201)
-        expect(resp.body.picture_url).toBe("newProfile.jpg")
+        expect(resp.body.user.picture_url).toBe("newProfile.jpg")
     })
     it("should update username if requester is a site admin", async () => {
         const resp = await request(app)
@@ -146,7 +144,7 @@ describe("PATCH /users/:userId", () => {
                         .set("authorization", `Bearer ${user3Token}`)
 
         expect(resp.status).toBe(201)
-        expect(resp.body.username).toBe("newUsername")
+        expect(resp.body.user.username).toBe("newUsername")
     })
     it("should update profile picture if requester is a site admin", async () => {
         const resp = await request(app)
@@ -155,7 +153,7 @@ describe("PATCH /users/:userId", () => {
                         .set("authorization", `Bearer ${user3Token}`)
 
         expect(resp.status).toBe(201)
-        expect(resp.body.picture_url).toBe("newProfile.jpg")
+        expect(resp.body.user.picture_url).toBe("newProfile.jpg")
     })
     it("should return a 401 if requester is not current user or site admin", async () => {
         const resp = await request(app)
@@ -167,7 +165,7 @@ describe("PATCH /users/:userId", () => {
                                 )
         expect(resp.status).toBe(401)
     })
-    it("should return a 400 error if user doesn't exist", async () => {
+    it("should return a 404 error if user doesn't exist", async () => {
         const resp = await request(app)
                                 .patch("/users/5000")
                                 .send({username:"newUsername"})
@@ -175,7 +173,7 @@ describe("PATCH /users/:userId", () => {
                                     "authorization",
                                     `Bearer ${user3Token}`
                                 )
-        expect(resp.status).toBe(400)
+        expect(resp.status).toBe(404)
     })
 })
 
@@ -210,6 +208,7 @@ describe("DELETE /users/:userId", () => {
                                         "authorization",
                                         `Bearer ${user2Token}`
                                     )
+
             expect(resp.status).toBe(401)
         }
     )

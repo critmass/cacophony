@@ -59,10 +59,12 @@ const ensureIsSiteAdmin = (req, res, next) => {
 const ensureIsCurrentUser = (req, res, next) => {
   try {
     const user = res.locals.user;
-    if (!user) {
-      throw new UnauthorizedError();
+    if(user) {
+      if( user.id === req.params.id) {
+        return next()
+      }
     }
-    return next();
+    throw new UnauthorizedError()
   } catch (err) {
     return next(err);
   }
@@ -70,11 +72,17 @@ const ensureIsCurrentUser = (req, res, next) => {
 
 const ensureSiteAdminOrCurrentUser = (req, res, next) => {
   try {
+
     const user = res.locals.user;
-    if (!(user && (user.isSiteAdmin || user.id === req.params.id))) {
-      throw new UnauthorizedError();
+
+    if(user) {
+      if(
+        user.isSiteAdmin ||
+        user.id === parseInt(req.params.userId,10)
+      ) return next()
     }
-    return next();
+    throw new UnauthorizedError();
+
   } catch (err) {
     return next(err);
   }

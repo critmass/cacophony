@@ -15,26 +15,36 @@ const {
     getRoom,
     patchRoom,
     deleteRoom
-} = require("./rooms");
+} = require("../services/rooms");
 const {
     createRole,
     getRoles,
     getRole,
     patchRole,
     deleteRole
-} = require("./roles");
+} = require("../services/roles");
 const {
     createMembership,
     getMembers,
     getMembership,
     patchMembership,
     deleteMembership
-} = require("./memberships");
+} = require("../services/memberships");
 const { ensureLoggedIn } = require("../middleware/auth");
 
-/** POST / {newServer} => {server:{id, name, picture_url, start_date}} */
+/** POST / {
+ *          serverName,
+ *          pictureUrl
+ *          } => { server:{
+ *                          id,
+ *                          name,
+ *                          picture_url,
+ *                          start_date
+ *                  }}
+ * */
 
-router.post("/",  async (req, res, next) => {})
+router.post("/",  async (req, res, next) => {
+})
 
 /** GET / => {servers:[{id, name, picture_url, start_date},...]} */
 
@@ -58,7 +68,24 @@ router.get("/", async (req, res, next) => {})
 
 router.get("/:serverId", async (req, res, next) => {})
 
-/** PATCH /[serverId] => {server:{id, name, picture_url}} */
+/** PATCH /[serverId] {
+ *                          name,
+ *                          picture_url
+ *                      } => {server:{
+ *                         id,
+ *                         name,
+ *                         picture_url,
+ *                         start_date,
+ *                         members:[{
+ *                              nickname,
+ *                              membership_id,
+ *                              role_id,
+ *                              picture_url,
+ *                              last_on
+ *                          }, ...],
+ *                         rooms:[{room_id, room_name, type}, ...]
+ *                     }}
+ * */
 
 router.patch("/:serverId", async (req, res, next) => {})
 

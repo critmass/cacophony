@@ -10,7 +10,7 @@ const updateMemebershipSchema = require("../json_schema/membershipUpdate.json")
 const { BadRequestError } = require("../expressError");
 
 
-/** POST / {user_id, role_id, nickname} =>
+/** POST / {userId, roleId, nickname} =>
  *                                  {
  *                                      server_id,
  *                                      membership:{
@@ -27,7 +27,7 @@ const { BadRequestError } = require("../expressError");
 const createMembership = async (req, res, next) => { }
 
 /** GET / => {
- *              serverId, members:[{
+ *              server_id, members:[{
  *                          member_id,
  *                          user_id,
  *                          role_id,
@@ -39,39 +39,38 @@ const createMembership = async (req, res, next) => { }
 
 const getMembers = async (req, res, next) => { }
 
-/** GET /[member_id] => {
+/** GET / => {
  *                          serverId,
  *                          membership:{
  *                                  membership_id,
  *                                  nickname,
  *                                  user_id,
  *                                  picture_url,
- *                                  role:{role_id, title, color},
- *                                  access:[{room_name, room_id}, ...]
+ *                                  role:{role_id, title, color}
  *                          }
  *                      }
  * */
 
 const getMembership = async (req, res, next) => { }
 
-/** PATCH /[member_id] {role_id, nickname} => {
- *                                              serverId,
- *                                              membership:{
- *                                                      member_id,
- *                                                      user_id,
- *                                                      nickname,
- *                                                      role:{
- *                                                            role_id,
- *                                                            title,
- *                                                            color,
- *                                                            is_admin
- *                                                        }
- *                                                      access:[{
- *                                                          room_name,
- *                                                          room_id
- *                                                      }, ...]
- *                                              }
- *                                          }
+/** PATCH /[memberId]  => {
+ *                          serverId,
+ *                          membership:{
+ *                                      member_id,
+ *                                      user_id,
+ *                                      nickname,
+ *                                      role:{
+ *                                          role_id,
+ *                                          title,
+ *                                          color,
+ *                                          is_admin
+ *                                          access:[{
+ *                                              room_name,
+ *                                              room_id
+ *                                          }, ...]
+ *                                      }
+ *                          }
+ *                      }
  * */
 
 const patchMembership = async (req, res, next) => { }

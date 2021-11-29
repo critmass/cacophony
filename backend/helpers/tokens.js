@@ -10,6 +10,7 @@ function createToken(user) {
       "createToken passed user without isSiteAdmin property");
 
   let payload = {
+    id:user.id,
     username: user.username,
     isSiteAdmin: user.isSiteAdmin || false,
   };

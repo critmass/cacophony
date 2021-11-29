@@ -21,15 +21,18 @@ const User = require("../database_models/user");
 
 const router = express.Router();
 
-/** POST / {username, } => {
- *                              user:{
- *                                  id,
- *                                  username,
- *                                  picture_url,
- *                                  joining_date,
- *                                  is_site_admin
- *                              }
- *                          }
+/** POST / {
+ *          username,
+ *          pictureUrl
+ *          } => {
+ *                  user:{
+ *                          id,
+ *                          username,
+ *                          picture_url,
+ *                          joining_date,
+ *                          is_site_admin
+ *                      }
+ *                  }
  *
  * Add a new user
 */
@@ -117,15 +120,14 @@ router.patch(
              * can update a user's site admin status
              * */
 
-            const isSiteAdmin = res.locals.user.isSiteAdmin?
+            const isSiteAdmin = res.locals.user.isSiteAdmin ?
                                     req.body.isSiteAdmin :
                                     null
-
 
             const user = await User.update({
                                     ...req.body,
                                     isSiteAdmin,
-                                    id:Number(req.params.userId)
+                                    id:parseInt(req.params.userId, 10)
             })
 
             return res.status(201).json({user})

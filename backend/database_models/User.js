@@ -289,8 +289,6 @@ class User {
                 isSiteAdmin:"is_site_admin"
         })
 
-        console.log(`${Object.entries(data)}:::${values}:::${setCols}`)
-
         const query = `
                         UPDATE users
                         SET ${setCols}
@@ -298,11 +296,9 @@ class User {
                         RETURNING
                             id,
                             username,
+                            picture_url,
                             is_site_admin,
                             last_on`
-
-        console.log(`${query}
-        [${values}]`)
 
         const result = await db.query(query, [...values, data.id])
 
