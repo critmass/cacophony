@@ -9,7 +9,7 @@ class Server {
 
     /** Creates a room (from data), update db, return new server info
      * data should be {serverName, picture_url}
-     * returns {id, name, picture_url}
+     * returns {id, name, picture_url, start_date}
      */
 
     static async create(serverName, picture_url=null) {
@@ -22,13 +22,13 @@ class Server {
                 RETURNING id, name, picture_url, start_date
         `, [serverName, picture_url, now])
 
-        const user = result.rows[0]
+        const server = result.rows[0]
 
         return {
-            id:user.id,
-            name:user.name,
-            picture_url:user.picture_url,
-            start_date:user.start_date
+            id:server.id,
+            name:server.name,
+            picture_url:server.picture_url,
+            start_date:server.start_date
         }
     };
 

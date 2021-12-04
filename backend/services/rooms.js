@@ -10,40 +10,48 @@ const router = new express.Router();
 const newRoomSchema = require("../json_schema/roomNew.json")
 const { BadRequestError } = require("../expressError");
 
-/** POST / {room_name} => {room:{room_id}} */
+/** POST / {name, type} => {room:{id, name, type}} */
 
 const createRoom = async (req, res, next) => { }
 
-/** GET / => {serverId, rooms:[{room_id, room_name, type}, ...]} */
+/** GET / => {serverId, rooms:[{id, name, type}, ...]} */
 
 const getRooms =  async (req, res, next) => { }
 
-/** GET /[room_id] => {room:{
- *                          room_id,
- *                          room_name,
+/** GET /[roomId] => {room:{
+ *                          id,
+ *                          name,
  *                          type,
  *                          members:[{
- *                              membership_id,
- *                              nickname
+ *                              id,
+ *                              nickname,
+ *                              color,
+ *                              access:{read_only, is_moderator}
  *                          }, ...]
  *                      }}
  * */
 
 const getRoom = async (req, res, next) => { }
 
-/** PATCH /[room_id] {room_id, new_name} => {
- *                                      serverId,
- *                                      room:{room_id, room_name, type}
- *                                  }
+/** PATCH /[roomId] { name } => {
+ *                                  server_id,
+ *                                  room:{id, name, type}
+ *                                  members:[{
+ *                                             id,
+ *                                             nickname,
+ *                                             color,
+ *                                             access:{read_only, is_moderator}
+ *                                         }, ...]
+ *                              }
  * */
 
 const patchRoom =  async (req, res, next) => { }
 
-/** DELETE /[room_id] => {serverId, room:{room_id, room_name, type}} */
+/** DELETE /[roomId] => {server_id, room:{room_id, room_name, type}} */
 
 const deleteRoom = async (req, res, next) => { }
 
-/** WS /[room_id] => a websocket connection to the room at room_id */
+/** WS /[roomId] => a websocket connection to the room at roomId */
 
 const roomWebsocket = async (ws, req, next) => { }
 

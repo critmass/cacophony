@@ -7,7 +7,6 @@ const jsonschema = require("jsonschema");
 const Server = require("../database_models/Server");
 const express = require("express");
 const router = new express.Router();
-const serverSchema = require("../json_schema/serverNew.json")
 const { BadRequestError } = require("../expressError");
 const {
     createRoom,
@@ -32,23 +31,84 @@ const {
 } = require("../services/memberships");
 const { ensureLoggedIn } = require("../middleware/auth");
 
+const serverNewSchema = require("../json_schema/serverNew.json")
+const serverUpdateSchema = require("../json_schema/serverUpdate.json");
+const Role = require("../database_models/Role");
+const Membership = require("../database_models/Membership");
+const Room = require("../database_models/Room");
+
 /** POST / {
  *          serverName,
  *          pictureUrl
- *          } => { server:{
- *                          id,
- *                          name,
- *                          picture_url,
- *                          start_date
- *                  }}
+ *          } => {  membership:{
+ *                         id,
+ *                         user_id,
+ *                         nickname,
+ *                         joining_date,
+ *                         role:{
+ *                                 id,
+ *                                 is_admin,
+ *                                 title,
+ *                                 color
+ *                         },
+ *                         server_id,
+ *                         picture_url
+ *                  }
+ *                  server:{
+ *                         id,
+ *                         name,
+ *                         picture_url,
+ *                         start_date,
+ *                         roles:[{id, title, color}, ...]
+ *                         rooms:[{id, name, type}]
+ *                  }
+ *              }
  * */
 
 router.post("/",  async (req, res, next) => {
+
+    try {
+        const validator = jsonschema.validate(req.body, serverNewSchema)
+        if(validator.valid) {
+            const errs = validator.errors.map( e => e.stack )
+            throw new BadRequestError(errs)
+        }
+
+        const server = await Server.create(req.body)
+        const adminRole = await Role.create(
+            {title:"admin", serverId:server.id, isAdmin:true})
+        const memberRole = await Role.create(
+            {title:"admin", serverId:server.id, isAdmin:false})
+        const membership = await Membership.create(
+                                                req.locals.user.id,
+                                                adminRole.id
+                                            )
+        const room = await Room.create("Main Room", server.id)
+        await Role.addAccess(adminRole.id, room.id, true)
+
+        return res.status(201).json({
+            membership,
+            server:{ ...server,
+                roles:[adminRole, memberRole],
+                rooms:[room]
+            }
+        })
+
+    } catch (err) {
+        next(err)
+    }
 })
 
 /** GET / => {servers:[{id, name, picture_url, start_date},...]} */
 
-router.get("/", async (req, res, next) => {})
+router.get("/", async (req, res, next) => {
+
+    try {
+
+    } catch (err) {
+        next(err)
+    }
+})
 
 /** GET /[serverId] => {server:{
  *                         id,

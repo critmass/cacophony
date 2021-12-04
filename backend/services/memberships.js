@@ -11,53 +11,74 @@ const { BadRequestError } = require("../expressError");
 
 
 /** POST / {userId, roleId, nickname} =>
- *                                  {
+ *                                  {membership:{
  *                                      server_id,
  *                                      membership:{
  *                                          member_id
  *                                          user_id,
- *                                          role_id,
+ *                                          role:{
+ *                                              id,
+ *                                              title,
+ *                                              color,
+ *                                              is_admin,
+ *                                              access:[{
+ *                                                  room_id,
+ *                                                  read_only,
+ *                                                  is_moderator
+ *                                              }, ...]
+ *                                          },
  *                                          nickname,
  *                                          join_date,
  *                                          picture_url
  *                                      }
- *                                  }
+ *                                  }}
  * */
 
 const createMembership = async (req, res, next) => { }
 
-/** GET / => {
+/** GET / => {members:{
  *              server_id, members:[{
  *                          member_id,
- *                          user_id,
- *                          role_id,
+ *                          role:{
+ *                              id,
+ *                              title,
+ *                              color
+ *                          },
  *                          nickname,
  *                          picture_url
  *                      }, ...]
- *          }
+ *          }}
  * */
 
 const getMembers = async (req, res, next) => { }
 
 /** GET / => {
- *                          serverId,
- *                          membership:{
- *                                  membership_id,
- *                                  nickname,
- *                                  user_id,
- *                                  picture_url,
- *                                  role:{role_id, title, color}
- *                          }
- *                      }
+ *              serverId,
+ *              membership:{
+ *                  member_id,
+ *                  nickname,
+ *                  role:{
+ *                      id,
+ *                      title,
+ *                      color,
+ *                      is_admin
+ *                      access:[{
+ *                          room_name,
+ *                          room_id,
+ *                          read_only,
+ *                          is_moderator
+ *                      }, ...]
+ *                  }
+ *              }
+ *          }
  * */
 
 const getMembership = async (req, res, next) => { }
 
-/** PATCH /[memberId]  => {
+/** PATCH /[memberId] { nickname, roleId } => {
  *                          serverId,
  *                          membership:{
  *                                      member_id,
- *                                      user_id,
  *                                      nickname,
  *                                      role:{
  *                                          role_id,
@@ -66,7 +87,9 @@ const getMembership = async (req, res, next) => { }
  *                                          is_admin
  *                                          access:[{
  *                                              room_name,
- *                                              room_id
+ *                                              room_id,
+ *                                              read_only,
+ *                                              is_moderator
  *                                          }, ...]
  *                                      }
  *                          }
@@ -78,19 +101,10 @@ const patchMembership = async (req, res, next) => { }
 /** DELETE /[member_id] => {
  *                              serverId,
  *                              membership:{
- *                                      member_id,
+ *                                      id,
  *                                      user_id,
  *                                      nickname,
- *                                      role:{
- *                                              role_id,
- *                                              title,
- *                                              color,
- *                                              is_admin
- *                                          }
- *                                      access:[{
- *                                          room_name,
- *                                          room_id
- *                                      }, ...]
+ *                                      role_id
  *                              }
  *                          }
  * */

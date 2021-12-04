@@ -1,7 +1,9 @@
 "use strict";
 
 const db = require("../db");
+const { NotFoundError } = require("../expressError");
 const { intToColor } = require("../helpers/colorConverter");
+const { sqlForPartialUpdate } = require("../helpers/sql");
 const User = require("./User");
 
 /** Related functions for users */
@@ -27,12 +29,12 @@ class Membership {
      *          }
      */
 
-    static async create(userId, roleId, picture_url=null) {
+    static async create(userId, roleId, pictureUrl=null) {
 
         const now = new Date()
 
         const user = await User.get(userId)
-        if(!picture_url) picture_url = user.picture_url
+        if(!pictureUrl) pictureUrl = user.picture_url
 
         const serverResult = await db.query(`
                 SELECT server_id as "id"
@@ -62,7 +64,7 @@ class Membership {
         `, [
             userId,
             roleId,
-            picture_url,
+            pictureUrl,
             user.username,
             now,
             serverInfo.id
@@ -219,19 +221,61 @@ class Membership {
         })
     };
 
-    // /** Finds members by role, user, and/or server
-    //  *
-    //  * return [{
-    //  *              id,
-    //  *              nickname,
-    //  *              server_id,
-    //  *              user_id,
-    //  *              is_admin,
-    //  *              picture_url
-    //  *      }, ...]
-    // */
+    /** Finds members by role, user, and/or server
+     *
+     * return [{
+     *              id,
+     *              nickname,
+     *              server_id,
+     *              user_id,
+     *              role:{id, title, color:{r, b, g}, is_admin},
+     *              picture_url
+     *      }, ...]
+    */
 
-    // static async find(userId=null, serverId=null, roleId=null);
+    static async find({userId=null, serverId=null, roleId=null}) {
+
+        const { setCols, values } = sqlForPartialUpdate(
+            { userId, serverId, roleId },
+            {
+                userId:"m.user_id",
+                serverId:"m.server_id",
+                roleId:"m.role_id"
+            }
+        )
+
+        const query = ` SELECT
+                            m.id as "id",
+                            m.nickname as "nickname",
+                            m.server_id as "server_id",
+                            m.user_id as "user_id",
+                            m.role_id as "role_id",
+                            m.picture_url as "picture_url",
+                            r.title as "title",
+                            r.color as "color",
+                            r.is_admin as "is_admin"
+                        FROM memberships m
+                        INNER JOIN roles r ON r.id = m.role_id
+                        WHERE ${setCols.split(",").join(" AND ")}`
+
+        const result = await db.query(query, values)
+
+        if (!result.rows.length) throw new NotFoundError()
+
+        return result.rows.map( row => ({
+            id:row.id,
+            nickname:row.nickname,
+            server_id:row.server_id,
+            user_id:row.user_id,
+            role:{
+                id:row.role_id,
+                title:row.title,
+                color:intToColor(row.color),
+                is_admin:row.is_admin
+            },
+            picture_url:row.picture_url
+        }))
+    };
 
     /** Given an id returns membership
      *

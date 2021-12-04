@@ -11,13 +11,13 @@ const newAccessSchema = require("../json_schema/roleNewAccess.json")
 const { BadRequestError } = require("../expressError");
 
 
-/** POST / {title, color, is_admin} =>
+/** POST / {title, color:{r,g,b}, isAdmin} =>
  *                                  {
  *                                      server_id,
  *                                      role:{
  *                                          role_id,
  *                                          title,
- *                                          color,
+ *                                          color:{r,g,b},
  *                                          is_admin
  *                                      }
  *                                  }
@@ -26,10 +26,10 @@ const { BadRequestError } = require("../expressError");
 const createRole =  async (req, res, next) => { }
 
 /** GET / => {
- *              serverId, roles:[{
+ *              server_id, roles:[{
  *                          role_id,
  *                          title,
- *                          color,
+ *                          color:{r,b,g},
  *                          is_admin
  *                      }, ...]
  *          }
@@ -37,12 +37,12 @@ const createRole =  async (req, res, next) => { }
 
 const getRoles = async (req, res, next) => { }
 
-/** GET /[role_id] => {
- *                          serverId,
+/** GET /[roleId] => {
+ *                          server_id,
  *                          role:{
  *                                  role_id,
  *                                  title,
- *                                  color,
+ *                                  color:{r,g,b},
  *                                  is_admin,
  *                                  members:[{nickname, member_id}, ...],
  *                                  access:[{room_id, room_name}, ...]
@@ -52,17 +52,16 @@ const getRoles = async (req, res, next) => { }
 
 const getRole = async (req, res, next) => { }
 
-/** PATCH /[role_id] {
- *                          role_id,
- *                          title,
- *                          color,
- *                          is_admin
+/** PATCH /[roleId] {
+ *                      title,
+ *                      color:{r,b,g},
+ *                      is_admin
  *                      } => {
  *                              serverId,
  *                              role:{
  *                                      role_id,
  *                                      title,
- *                                      color,
+ *                                      color:{r,b,g},
  *                                      is_admin
  *                                  }
  *                          }
@@ -70,12 +69,12 @@ const getRole = async (req, res, next) => { }
 
 const patchRole = async (req, res, next) => { }
 
-/** DELETE /[role_id] => {
+/** DELETE /[roleId] => {
  *                          serverId,
  *                          room:{
  *                              role_id,
  *                              title,
- *                              color,
+ *                              color:{r,b,g},
  *                              is_admin
  *                          }
  *                      }

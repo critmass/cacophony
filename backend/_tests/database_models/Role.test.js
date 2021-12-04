@@ -59,7 +59,7 @@ describe("Get Role", () => {
 
 describe("Create Role", () => {
     it("creates a role", async () => {
-        const role = await Role.create("new_role", 1)
+        const role = await Role.create({title:"new_role", serverId:1})
         expect(role.id).toBe(7)
         expect(role.title).toBe("new_role")
         expect(role.server_id).toBe(1)

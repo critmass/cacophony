@@ -88,6 +88,57 @@ describe("Get Memberships", () => {
     })
 })
 
+describe("Find Memberships", () => {
+    it("finds memberships by user id", async () => {
+        const members = await Membership.find({userId:1})
+        expect(members.length).toBe(2)
+    })
+    it("Throws an error if user doesn't exist", async () => {
+        try {
+            await Membership.find({userId:5000})
+
+        } catch (err) {
+            expect(err instanceof Error).toBeTruthy()
+        }
+    })
+    it("finds memberships by server id", async () => {
+        const members = await Membership.find({serverId:1})
+        expect(members.length).toBe(3)
+    })
+    it("Throws an error if server doesn't exist", async () => {
+        try {
+            await Membership.find({serverId:5000})
+
+        } catch (err) {
+            expect(err instanceof Error).toBeTruthy()
+        }
+    })
+    it("finds memberships by role id", async () => {
+        const members = await Membership.find({roleId:1})
+        expect(members.length).toBe(1)
+    })
+    it("Throws an error if role doesn't exist", async () => {
+        try {
+            await Membership.find({roleId:5000})
+
+        } catch (err) {
+            expect(err instanceof Error).toBeTruthy()
+        }
+    })
+    it("finds memberships by role id and user id", async () => {
+        const members = await Membership.find({roleId:2, userId:2})
+        expect(members.length).toBe(1)
+    })
+    it("Throws an error if membership doesn't exist", async () => {
+        try {
+            await Membership.find({roleId:7, userId:1})
+
+        } catch (err) {
+            expect(err instanceof Error).toBeTruthy()
+        }
+    })
+})
+
 describe("Create Memberships", () => {
     it("creates a new member", async () => {
         const member = await Membership.create(1, 6, defaultImgURL)

@@ -16,7 +16,7 @@ class Role {
      * returns {id, title, server_id, color}
      */
 
-    static async create(title, serverId, color=defaultColor) {
+    static async create({title, serverId, color=defaultColor, isAdmin=false}) {
 
         const colorSQL = colorToInt(color)
 
@@ -24,9 +24,9 @@ class Role {
                 INSERT INTO roles (
                     title, server_id, color, is_admin
                 )
-                VALUES ($1, $2, $3, 'f')
+                VALUES ($1, $2, $3, $4)
                 RETURNING id, title, server_id, color
-        `,[title, serverId, colorSQL])
+        `,[title, serverId, colorSQL, isAdmin])
 
         return {
             ...result.rows[0],

@@ -20,7 +20,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
     }
     return reducedKeys
   },[]).map((colName, idx) =>
-            `"${jsToSql[colName] || colName}"=$${idx + 1}`,
+            `${jsToSql[colName] || colName}=$${idx + 1}`,
   );
 
   return { setCols: cols.join(", "), values };
