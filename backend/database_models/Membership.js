@@ -60,6 +60,7 @@ class Membership {
                     nickname,
                     role_id,
                     server_id,
+                    joining_date,
                     picture_url
         `, [
             userId,
@@ -101,7 +102,6 @@ class Membership {
      *              nickname,
      *              user_id,
      *              role:{id, title, color:{r, b, g}, is_admin},
-     *              isadmin,
      *              picture_url
      *      }, ...]
     */
@@ -116,11 +116,14 @@ class Membership {
                     r.id AS "role_id",
                     r.title AS "title",
                     r.color AS "color",
+                    r.is_admin AS "is_admin",
                     m.picture_url AS "picture_url"
                 FROM memberships m
                 INNER JOIN roles r ON m.role_id = r.id
                 WHERE m.server_id = $1
         `, [serverId])
+
+        if (!result.rows.length) throw new NotFoundError()
 
         return result.rows.map( row => {
 
@@ -167,6 +170,8 @@ class Membership {
                 WHERE m.user_id = $1
         `, [userId])
 
+        if (!result.rows.length) throw new NotFoundError()
+
         return result.rows.map(row => {
 
             return {
@@ -208,6 +213,8 @@ class Membership {
                 INNER JOIN roles r ON m.role_id = r.id
                 WHERE m.role_id = $1
         `, [roleId])
+
+        if (!result.rows.length) throw new NotFoundError()
 
         return result.rows.map(row => {
 

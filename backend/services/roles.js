@@ -8,26 +8,39 @@ const Role = require("../database_models/Role");
 const newRoleSchema = require("../json_schema/roleNew.json");
 const updateRoleSchema = require("../json_schema/roleUpdate.json")
 const newAccessSchema = require("../json_schema/roleNewAccess.json")
-const { BadRequestError } = require("../expressError");
+const { BadRequestError, NotFoundError, ForbiddenError } = require("../expressError");
+const { intToColor } = require("../helpers/colorConverter");
+const { checkIfRoleIsOnSever } = require("../helpers/roleHelpers");
 
 
 /** POST / {title, color:{r,g,b}, isAdmin} =>
  *                                  {
- *                                      server_id,
  *                                      role:{
- *                                          role_id,
+ *                                          id,
  *                                          title,
+ *                                          server_id,
  *                                          color:{r,g,b},
  *                                          is_admin
  *                                      }
  *                                  }
  * */
 
-const createRole =  async (req, res, next) => { }
+const createRole =  async (req, res, next) => {
+    try {
+        const validator = jsonschema.validate(req.body, newRoleSchema)
+        if(!validator.valid) throw new BadRequestError(validator.errors)
+
+        const role = await Role.create(
+                        {...req.body,serverId:req.params.serverId})
+        return res.status(201).json({role})
+    } catch (err) {
+        next(err)
+    }
+}
 
 /** GET / => {
  *              server_id, roles:[{
- *                          role_id,
+ *                          id,
  *                          title,
  *                          color:{r,b,g},
  *                          is_admin
@@ -35,31 +48,49 @@ const createRole =  async (req, res, next) => { }
  *          }
  * */
 
-const getRoles = async (req, res, next) => { }
+const getRoles = async (req, res, next) => {
+    try {
+        const roles = await Role.find(req.params.serverId)
+        return res.status(200).json({
+            server_id:roles[0].server_id,
+            roles:roles.map( role => ({
+                id:role.id,
+                title:role.title,
+                color:role.color,
+                is_admin:role.is_admin
+            }))
+        })
+    } catch (err) {
+        next(err)
+    }
+}
 
-/** GET /[roleId] => {
+/** GET /[roleId] => {role:{
+ *                          role_id,
  *                          server_id,
- *                          role:{
- *                                  role_id,
- *                                  title,
- *                                  color:{r,g,b},
- *                                  is_admin,
- *                                  members:[{nickname, member_id}, ...],
- *                                  access:[{room_id, room_name}, ...]
- *                              }
- *                      }
+ *                          title,
+ *                          color:{r,g,b},
+ *                          is_admin,
+ *                          members:[{nickname, member_id}, ...],
+ *                          access:[{room_id, room_name}, ...]
+ *                      }}
  * */
 
-const getRole = async (req, res, next) => { }
+const getRole = async (req, res, next) => {
+    try {
+        await checkIfRoleIsOnSever(
+            parseInt(req.params.serverId), parseInt(req.params.roleId))
+        const role = await Role.get(req.params.roleId)
+        return res.status(200).json({role})
+    } catch (err) {
+        next(err)
+    }
+}
 
-/** PATCH /[roleId] {
- *                      title,
- *                      color:{r,b,g},
- *                      is_admin
- *                      } => {
- *                              serverId,
+/** PATCH /[roleId] {title, color:{r,b,g}, is_admin} => {
  *                              role:{
  *                                      role_id,
+ *                                      server_id,
  *                                      title,
  *                                      color:{r,b,g},
  *                                      is_admin
@@ -67,12 +98,29 @@ const getRole = async (req, res, next) => { }
  *                          }
  * */
 
-const patchRole = async (req, res, next) => { }
+const patchRole = async (req, res, next) => {
+
+    try {
+
+        const validator = jsonschema.validate(req.body, updateRoleSchema)
+        if(!validator.valid) throw new BadRequestError()
+
+        await checkIfRoleIsOnSever(
+            parseInt(req.params.serverId),parseInt(req.params.roleId))
+
+        const role = await Role.update(req.params.roleId, req.body)
+
+        return res.status(201).json({role})
+    } catch (err) {
+        next(err)
+    }
+
+}
 
 /** DELETE /[roleId] => {
- *                          serverId,
  *                          room:{
  *                              role_id,
+ *                              server_id,
  *                              title,
  *                              color:{r,b,g},
  *                              is_admin
@@ -80,6 +128,15 @@ const patchRole = async (req, res, next) => { }
  *                      }
  * */
 
-const deleteRole =  async (req, res, next) => { }
+const deleteRole =  async (req, res, next) => {
+    try {
+        await checkIfRoleIsOnSever(
+            parseInt(req.params.serverId), parseInt(req.params.roleId))
+        const role = await Role.remove(req.params.roleId)
+        return res.status(201).json({role})
+    } catch (err) {
+        next(err)
+    }
+}
 
 module.exports = { getRole, getRoles, deleteRole, patchRole, createRole }

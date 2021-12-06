@@ -1,33 +1,19 @@
 {
     "type":"object",
-    "required":[
-        "role_id",
-        "updates"
-    ],
+
     "properties":{
-        "role_id":{
-            "type":"integer"
+
+        "is_admin":{
+            "type":"boolean"
         },
-        "updates":{
-            "type":"object",
-            "required":[
-                "is_admin",
-                "title",
-                "color"
-            ],
-            "properties":{
-                "is_admin":{
-                    "type":"boolean"
-                },
-                "title":{
-                    "type":"string",
-                    "minLength":1,
-                    "maxLength":32
-                },
-                "color":{
-                    "type":"integer"
-                }
-            }
+        "title":{
+            "type":"string",
+            "minLength":1,
+            "maxLength":32
+        },
+        "color":{
+            "type":"object"
         }
+
     }
 }

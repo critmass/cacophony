@@ -2,6 +2,7 @@
 
 const db = require("../db");
 const { NotFoundError } = require("../expressError");
+const { sqlForPartialUpdate } = require("../helpers/sql")
 
 /** Related functions for Server */
 
@@ -12,7 +13,7 @@ class Server {
      * returns {id, name, picture_url, start_date}
      */
 
-    static async create(serverName, picture_url=null) {
+    static async create({name, pictureUrl=null}) {
 
         const now = new Date()
 
@@ -20,7 +21,7 @@ class Server {
                 INSERT INTO servers (name, picture_url, start_date)
                 VALUES ($1, $2, $3)
                 RETURNING id, name, picture_url, start_date
-        `, [serverName, picture_url, now])
+        `, [name, pictureUrl, now])
 
         const server = result.rows[0]
 
@@ -101,8 +102,9 @@ class Server {
      *              id,
      *              name,
      *              picture_url,
+     *              start_date,
      *              rooms:[{id, name, type}, ...],
-     *              roles:[{id, title, is_admin}, ...],
+     *              roles:[{id, title, is_admin, color}, ...],
      *              members:[{id, user_id, nickname, picture_url}, ...]
      *          }
      */
@@ -110,14 +112,15 @@ class Server {
     static async get(id) {
 
         let result = await db.query(`
-                SELECT id, name, picture_url FROM servers
+                SELECT id, name, picture_url, start_date FROM servers
                 WHERE id = $1
         `, [id])
 
         const serverInfo = result.rows[0]
+        if(!serverInfo) throw new NotFoundError("server not found")
 
         result = await db.query(`
-            SELECT id, title, is_admin FROM roles
+            SELECT id, title, color, is_admin FROM roles
             WHERE server_id = $1
         `, [id])
 
@@ -131,7 +134,14 @@ class Server {
         const rooms = [...result.rows]
 
         result = await db.query(`
-            SELECT id, user_id, nickname, picture_url FROM memberships
+            SELECT
+                id,
+                user_id,
+                nickname,
+                picture_url,
+                joining_date,
+                role_id
+            FROM memberships
             WHERE server_id = $1
         `, [id])
 
@@ -141,11 +151,37 @@ class Server {
             id:serverInfo.id,
             name:serverInfo.name,
             picture_url:serverInfo.picture_url,
+            start_date:serverInfo.start_date,
             rooms,
             roles,
             members
         }
     };
+
+    /** Updates server
+     *
+     * date require (id, {name, pictureUrl})
+     * returns {id, name, picture_url}
+     *
+     * throws an error if id not found                    }
+     */
+
+    static async update(id, {name, pictureUrl}) {
+
+        const {setCols, values} = sqlForPartialUpdate(
+            {name, pictureUrl}, {pictureUrl:"picture_url"}
+        )
+
+        const setQuery = `
+                UPDATE servers
+                SET ${setCols}
+                WHERE id = $${values.length + 1}
+                RETURNING id, name, picture_url, start_date
+        `
+        const result = await db.query(setQuery, [...values, id])
+
+        return result.rows[0]
+    }
 
     /** Updates a name of server
      *

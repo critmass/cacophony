@@ -48,9 +48,9 @@ const commonBeforeAll = async () => {
         isSiteAdmin:true
     }) //ID:5
 
-    await Server.create("server1", defaultImgURL) //ID:1
-    await Server.create("server2", defaultImgURL) //ID:2
-    await Server.create("server3", defaultImgURL) //ID:3
+    await Server.create({name:"server1", pictureUrl:defaultImgURL}) //ID:1
+    await Server.create({name:"server2", pictureUrl:defaultImgURL}) //ID:2
+    await Server.create({name:"server3", pictureUrl:defaultImgURL}) //ID:3
 
     await Room.create("room11", 1) //ID:1
     await Room.create("room12", 1) //ID:2
@@ -60,12 +60,55 @@ const commonBeforeAll = async () => {
     await Room.create("room32", 3) //ID:6
     await Room.create("room13", 1) //ID:7
 
-    await Role.create("role1a", 1, defaultColor1) //ID:1
-    await Role.create("role1m", 1, defaultColor2) //ID:2
-    await Role.create("role2a", 2, defaultColor1) //ID:3
-    await Role.create("role2m", 2, defaultColor2) //ID:4
-    await Role.create("role3a", 3, defaultColor1) //ID:5
-    await Role.create("role3m", 3, defaultColor2) //ID:6
+    /** ID:1 */
+    await Role.create({
+        title:"role1a",
+        serverId:1,
+        color:defaultColor1,
+        isAdmin:true
+    })
+    /** ID:2 */
+    await Role.create({
+        title:"role1m",
+        serverId:1,
+        color:defaultColor2,
+        isAdmin:false
+    })
+    /** ID:3 */
+    await Role.create({
+        title:"role2a",
+        serverId:2,
+        color:defaultColor1,
+        isAdmin:true
+    })
+    /** ID:4 */
+    await Role.create({
+        title:"role2m",
+        serverId:2,
+        color:defaultColor2,
+        isAdmin:false
+    })
+    /** ID:5 */
+    await Role.create({
+        title:"role3a",
+        serverId:3,
+        color:defaultColor1,
+        isAdmin:true
+    })
+    /** ID:6 */
+    await Role.create({
+        title:"role3m",
+        serverId:3,
+        color:defaultColor2,
+        isAdmin:false
+    })
+    /** ID:7 */
+    await Role.create({
+        title:"role to be deleted",
+        serverId:1,
+        color:defaultColor1,
+        isAdmin:false
+    })
 
     await Role.addAccess(1, 1, true ) //ID:1
     await Role.addAccess(1, 2, true ) //ID:2

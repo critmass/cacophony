@@ -146,7 +146,11 @@ class Role {
      * returns { id, title, server_id, color, is_admin }
      */
 
-    static async update(id, {title=null, color=null, isAdmin=null}) {
+    static async update(id, data) {
+
+        let color = colorToInt(data.color)
+        const title = data.title
+        const isAdmin = data.isAdmin
 
         const {setCols, values} = sqlForPartialUpdate(
             {id, title, color, isAdmin}, {
@@ -166,7 +170,9 @@ class Role {
 
         if(!result.rows[0].id) throw new NotFoundError()
 
-        return {...result.rows[0]}
+        color = intToColor(result.rows[0].color)
+
+        return {...result.rows[0], color}
     };
 
     /** Adds access to a room to a role

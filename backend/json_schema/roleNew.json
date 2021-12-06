@@ -1,14 +1,17 @@
 {
     "type":"object",
-    "required":["title", "server_id"],
+    "required":["title"],
     "properties":{
         "title":{
             "type":"string",
             "minLength":3,
             "maxLength":32
         },
-        "server_id":{
-            "type":"integer"
+        "color":{
+            "type":"object"
+        },
+        "isAdmin":{
+            "type":"boolean"
         }
     }
 }

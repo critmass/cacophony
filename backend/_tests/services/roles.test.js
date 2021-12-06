@@ -8,7 +8,12 @@ const {
     commonBeforeEach,
     commonAfterEach,
     commonAfterAll,
-    defaultColor1
+    defaultColor1,
+    user1Token,
+    user2Token,
+    user4Token,
+    user5Token,
+    defaultColor2
 } = require("../routes/_testCommon");
 
 beforeAll(commonBeforeAll)
@@ -31,6 +36,7 @@ describe("POST /servers/:serverId/roles", () => {
                                     `Bearer ${user1Token}`
                                 )
         expect(resp.status).toBe(201)
+        expect(resp.body.role.server_id).toBe(1)
         expect(resp.body.role.title).toBe(newRole.title)
         expect(resp.body.role.color.r).toBe(newRole.color.r)
         expect(resp.body.role.color.b).toBe(newRole.color.b)
@@ -46,7 +52,7 @@ describe("POST /servers/:serverId/roles", () => {
                                 )
         expect(resp.status).toBe(401)
     })
-    it("should return 404 if sender is non-admin", async () => {
+    it("should return 404 if server not found", async () => {
         const resp = await request(app)
                                 .post("/servers/5000/roles")
                                 .send(newRole)
@@ -99,10 +105,10 @@ describe("GET /servers/:serverId/roles/:roleId", () => {
                                 )
         expect(resp.status).toBe(200)
         expect(resp.body.role.id).toBe(2)
-        expect(resp.body.role.title).toBe(newRole.title)
-        expect(resp.body.role.color.r).toBe(newRole.color.r)
-        expect(resp.body.role.color.b).toBe(newRole.color.b)
-        expect(resp.body.role.color.g).toBe(newRole.color.g)
+        expect(resp.body.role.title).toBe("role1m")
+        expect(resp.body.role.color.r).toBe(defaultColor2.r)
+        expect(resp.body.role.color.b).toBe(defaultColor2.b)
+        expect(resp.body.role.color.g).toBe(defaultColor2.g)
         expect(resp.body.role.access instanceof Array).toBeTruthy()
         expect(resp.body.role.members instanceof Array).toBeTruthy()
     })
@@ -149,14 +155,12 @@ describe("PATCH /servers/:serverId/roles/:roleId", () => {
                                     "authorization",
                                     `Bearer ${user1Token}`
                                 )
-        expect(resp.status).toBe(200)
+        expect(resp.status).toBe(201)
         expect(resp.body.role.id).toBe(2)
         expect(resp.body.role.title).toBe(newRole.title)
         expect(resp.body.role.color.r).toBe(newRole.color.r)
         expect(resp.body.role.color.b).toBe(newRole.color.b)
         expect(resp.body.role.color.g).toBe(newRole.color.g)
-        expect(resp.body.role.access instanceof Array).toBeTruthy()
-        expect(resp.body.role.members instanceof Array).toBeTruthy()
     })
     it("should return 401 status if user is not server admin", async () => {
         const resp = await request(app)
@@ -201,15 +205,13 @@ describe("PATCH /servers/:serverId/roles/:roleId", () => {
 describe("DELETE /servers/:serverId/roles/:roleId", () => {
     it("should delete a role if the user is a server admin", async () => {
         const resp = await request(app)
-                                .delete("/servers/1/roles/2")
-                                .send(newRole)
+                                .delete("/servers/1/roles/7")
                                 .set(
                                     "authorization",
                                     `Bearer ${user1Token}`
                                 )
-        expect(resp.status).toBe(200)
-        expect(resp.body.role.id).toBe(2)
-        expect(resp.body.role.title).toBe(newRole.title)
+        expect(resp.status).toBe(201)
+        expect(resp.body.role.title).toBe("role to be deleted")
         expect(resp.body.role.color.r).toBe(defaultColor1.r)
         expect(resp.body.role.color.b).toBe(defaultColor1.b)
         expect(resp.body.role.color.g).toBe(defaultColor1.g)
@@ -217,7 +219,6 @@ describe("DELETE /servers/:serverId/roles/:roleId", () => {
     it("should return 401 status if user is not server admin", async () => {
         const resp = await request(app)
                                 .delete("/servers/1/roles/1")
-                                .send(newRole)
                                 .set(
                                     "authorization",
                                     `Bearer ${user2Token}`
@@ -225,7 +226,6 @@ describe("DELETE /servers/:serverId/roles/:roleId", () => {
         expect(resp.status).toBe(401)
         const resp1 = await request(app)
                                 .delete("/servers/1/roles/1")
-                                .send(newRole)
                                 .set(
                                     "authorization",
                                     `Bearer ${user5Token}`
@@ -235,7 +235,6 @@ describe("DELETE /servers/:serverId/roles/:roleId", () => {
     it("should return 404 status if role not on server", async () => {
         const resp = await request(app)
                                 .delete("/servers/1/roles/5")
-                                .send(newRole)
                                 .set(
                                     "authorization",
                                     `Bearer ${user1Token}`
@@ -245,7 +244,6 @@ describe("DELETE /servers/:serverId/roles/:roleId", () => {
     it("should return 404 status if server not found", async () => {
         const resp = await request(app)
                                 .delete("/servers/5000/roles/5")
-                                .send(newRole)
                                 .set(
                                     "authorization",
                                     `Bearer ${user5Token}`

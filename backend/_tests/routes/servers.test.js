@@ -21,7 +21,7 @@ afterAll(commonAfterAll)
 
 describe("POST /servers", () => {
     const newServer = {
-        serverName:"newServer",
+        name:"newServer",
         pictureUrl:"newImage.jpg"
     }
     it("creates a new server if sent by a valid user", async () => {
@@ -34,7 +34,7 @@ describe("POST /servers", () => {
                                     )
 
         expect(resp.status).toBe(201)
-        expect(resp.body.server.name).toBe(newServer.serverName)
+        expect(resp.body.server.name).toBe(newServer.name)
         expect(resp.body.server.picture_url).toBe(newServer.pictureUrl)
     })
     it("throws a 401 error if invalid user sends it", async () => {
@@ -48,16 +48,6 @@ describe("POST /servers", () => {
         const resp = await request(app)
                                 .post("/servers")
                                 .send({pictureUrl:"someImage.jpg"})
-                                .set(
-                                    "authorization",
-                                    `Bearer ${user1Token}`
-                                )
-        expect(resp.status).toBe(400)
-    })
-    it("throws a 400 error if request is missing a picture url", async () => {
-        const resp = await request(app)
-                                .post("/servers")
-                                .send({serverName:"best server ever"})
                                 .set(
                                     "authorization",
                                     `Bearer ${user1Token}`
@@ -120,6 +110,7 @@ describe("GET /servers/:serverId", () => {
                                         "authorization",
                                         `Bearer ${user4Token}`
                                     )
+        // console.log(resp)
         expect(resp.status).toBe(401)
     })
     it("returns 404 if server is not found", async () => {
@@ -135,7 +126,7 @@ describe("GET /servers/:serverId", () => {
 
 describe("PATCH /servers/:serverId", () => {
     const updatedServer = {
-        serverName: "newServer",
+        name: "newServer",
         pictureUrl: "newImage.jpg"
     }
     it("should update server's information if sent by an admin", async () => {
@@ -146,12 +137,10 @@ describe("PATCH /servers/:serverId", () => {
                                         "authorization",
                                         `Bearer ${user1Token}`
                                     )
-        expect(resp.status).toBe(200)
+        expect(resp.status).toBe(201)
         expect(resp.body.server.id).toBe(1)
-        expect(resp.body.server.name).toBe(updatedServer.serverName)
+        expect(resp.body.server.name).toBe(updatedServer.name)
         expect(resp.body.server.picture_url).toBe(updatedServer.pictureUrl)
-        expect(resp.body.server.members instanceof Array).toBeTruthy()
-        expect(resp.body.server.rooms instanceof Array).toBeTruthy()
     })
     it("should return 401 status if user isn't an admin of the server",
         async () => {
@@ -184,7 +173,7 @@ describe("DELETE /servers/:serverId", () => {
                                     "authorization",
                                     `Bearer ${user1Token}`
                                 )
-        expect(resp.status).toBe(200)
+        expect(resp.status).toBe(201)
     })
     it("should delete a server if the user is a site admin", async () => {
         const resp = await request(app)
@@ -193,7 +182,7 @@ describe("DELETE /servers/:serverId", () => {
                                     "authorization",
                                     `Bearer ${user5Token}`
                                 )
-        expect(resp.status).toBe(200)
+        expect(resp.status).toBe(201)
     })
     it("should return a 401 status code if not an admin or site admin", async () => {
         const resp = await request(app)

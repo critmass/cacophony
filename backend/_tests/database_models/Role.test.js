@@ -131,7 +131,8 @@ describe("Remove Access to Role", () => {
 describe("Remove Role", () => {
 
     it("should remove a role", async () => {
-        const {id} = await Role.create('role_to_remove', 1)
+        const {id} = await Role.create(
+                                {title:'role_to_remove', serverId:1})
         const removedRole = await Role.remove(id)
         expect(removedRole.title).toBe('role_to_remove')
         expect(removedRole.color.r).toBe(255)

@@ -283,7 +283,6 @@ class User {
                 pictureUrl:data.pictureUrl,
                 isSiteAdmin:data.isSiteAdmin
             }, {
-                id:"id",
                 username:"username",
                 pictureUrl:"picture_url",
                 isSiteAdmin:"is_site_admin"

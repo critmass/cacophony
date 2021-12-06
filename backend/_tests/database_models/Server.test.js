@@ -65,14 +65,15 @@ describe("Get Server", () => {
 
 describe("Create Server", () => {
     it("can create a new server", async () => {
-        const newServer = await Server.create("new_server", defaultImgURL)
+        const newServer = await Server.create(
+            {name:"new_server", pictureUrl:defaultImgURL})
         expect(newServer.id).toBe(4)
         expect(newServer.name).toBe("new_server")
         expect(newServer.picture_url).toBe(defaultImgURL)
     })
     it("doesn't create a server with a name of an existing server", async () => {
         try {
-            await Server.create("s1", defaultImgURL)
+            await Server.create({name:"s1", pictureUrl:defaultImgURL})
             fail()
         }
         catch(err) {
@@ -93,5 +94,23 @@ describe("Delete Server", () => {
         catch (err) {
             expect(err instanceof Error).toBeTruthy()
         }
+    })
+})
+
+describe("Update Server", () => {
+    const updatedServer = {name:"update server", pictureUrl:"newImage.jpg"}
+    it("update a server", async () => {
+        const server = await Server.update(1, updatedServer)
+        expect(server.id).toBe(1)
+        expect(server.name).toBe(updatedServer.name)
+        expect(server.picture_url).toBe(updatedServer.pictureUrl)
+    })
+    it("throws an error if you try to update " +
+        "a server that doesn't exist", async () => {
+            try {
+                await Server.update(5000, updatedServer)
+            } catch (err) {
+                expect(err instanceof Error).toBeTruthy()
+            }
     })
 })
