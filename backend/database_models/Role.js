@@ -99,6 +99,8 @@ class Role {
                 WHERE r.id = $1
         `, [id])
 
+        if(!result.rows.length) throw new NotFoundError("role not found")
+
         const roleInfo = {
             id: result.rows[0].id,
             title: result.rows[0].title,
@@ -168,7 +170,7 @@ class Role {
                     id, title, server_id, color, is_admin
         `, [...values])
 
-        if(!result.rows[0].id) throw new NotFoundError()
+        if(!result.rows.length) throw new NotFoundError()
 
         color = intToColor(result.rows[0].color)
 

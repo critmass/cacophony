@@ -140,8 +140,9 @@ describe("Find Memberships", () => {
 })
 
 describe("Create Memberships", () => {
+    const newMember = {userId:1, roleId:6, serverId:3}
     it("creates a new member", async () => {
-        const member = await Membership.create(1, 6, defaultImgURL)
+        const member = await Membership.create(newMember)
         expect(member.id).toBe(8)
         expect(member.user_id).toBe(1)
         expect(member.server_id).toBe(3)
@@ -149,7 +150,6 @@ describe("Create Memberships", () => {
         expect(member.role.title).toBe('r3n')
         expect(member.picture_url).toBe(defaultImgURL)
     })
-
 })
 
 describe("Update Memberships Nickname", () => {

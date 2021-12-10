@@ -6,8 +6,7 @@ const db = require("../db")
 const { BCRYPT_WORK_FACTOR } = require("../config");
 const { UnauthorizedError, NotFoundError, BadRequestError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
-
-
+const { intToColor } = require("../helpers/colorConverter");
 
 /** Related functions for users */
 
@@ -18,10 +17,12 @@ class User {
      * returns {
      *              id,
      *              username,
-     *              picture_url,
-     *              joining_date,
      *              is_site_admin,
-     *              memberships:[{ id, roleId, nickname, serverId}, ...]
+     *              memberships:[{
+     *                  role_id,
+     *                  is_server_admin,
+     *                  server_id
+     *              }, ...]
      *          }
      */
 
@@ -32,17 +33,16 @@ class User {
                     u.id AS "id",
                     u.username AS "username",
                     u.hashed_password AS "password",
-                    u.picture_url AS "picture_url",
-                    u.joining_date AS "joining_date",
-                    u.last_on AS "last_on",
                     u.is_site_admin AS "is_site_admin",
+                    r.is_admin AS "is_server_admin",
                     m.id AS "member_id",
-                    m.nickname AS "nickname",
                     m.server_id AS "server_id",
                     m.role_id AS "role_id"
                 FROM users u
                 LEFT JOIN memberships m
                         ON u.id = m.user_id
+                LEFT JOIN roles r
+                        ON m.role_id = r.id
                 WHERE u.username = $1
         `, [username])
 
@@ -58,20 +58,16 @@ class User {
             return {
                 id:result.rows[0].id,
                 username:result.rows[0].username,
-                picture_url:result.rows[0].picture_url,
-                joining_date:result.rows[0].joining_date,
-                last_on:result.rows[0].last_on,
                 is_site_admin:result.rows[0].is_site_admin,
                 memberships:result.rows[0].member_id ?
                                 result.rows.map( row => {
                                     return {
                                         id:row.member_id,
-                                        nickname:row.nickname,
                                         serverId:row.server_id,
-                                        roleId:row.role_id
+                                        role_id:row.role_id,
+                                        is_admin:row.is_server_admin
                                     }
-                                }):
-                                []
+                                }):[]
             }
         }
         else throw new UnauthorizedError("bad password")
@@ -185,7 +181,12 @@ class User {
      *                          name,
      *                          picture_url
      *                      },
-     *                      role:{ id, title, color }
+     *                      role:{
+     *                              id,
+     *                              title,
+     *                              color:{r,b,g},
+     *                              is_admin
+     *                      }
      *              }, ...]
      *          }
      *
@@ -209,7 +210,9 @@ class User {
                     s.picture_url AS "server_picture_url",
                     r.id AS "role_id",
                     r.title AS "role_title",
-                    r.color AS "role_color"
+                    r.color AS "role_color",
+                    r.is_admin AS "is_server_admin",
+                    m.joining_date AS "joining_date"
                 FROM users u
                 LEFT JOIN memberships m
                         ON u.id = m.user_id
@@ -220,8 +223,9 @@ class User {
                 WHERE u.id = $1
         `, [id])
 
-        if( !result.rows[0].id ) throw new
-                            NotFoundError("no user with that id")
+        if( !result.rows.length ) {
+            throw new NotFoundError("no user with that id")
+        }
 
         const basicInfo = result.rows[0]
 
@@ -236,6 +240,7 @@ class User {
                 return {
                     id:row.member_id,
                     nickname:row.nickname,
+                    joining_date:row.joining_date,
                     server:{
                         id:row.server_id,
                         name:row.name,
@@ -244,7 +249,8 @@ class User {
                     role:{
                         id:row.role_id,
                         title:row.role_title,
-                        color:row.role_color
+                        color:intToColor(row.role_color),
+                        is_admin:row.is_server_admin
                     }
                 }
             })

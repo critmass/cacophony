@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { NotFoundError } = require("../expressError");
+const { NotFoundError, ForbiddenError, BadRequestError } = require("../expressError");
 const { intToColor } = require("../helpers/colorConverter");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 const User = require("./User");
@@ -22,77 +22,85 @@ class Membership {
      *              role:{
      *                      id,
      *                      is_admin,
-     *                      title
+     *                      title,
+     *                      color:{r,b,g}
      *              },
      *              server_id,
      *              picture_url
      *          }
      */
 
-    static async create(userId, roleId, pictureUrl=null) {
+    static async create(
+        {userId, roleId, serverId, nickname=null, pictureUrl=null}) {
 
-        const now = new Date()
+            const now = new Date()
 
-        const user = await User.get(userId)
-        if(!pictureUrl) pictureUrl = user.picture_url
+            const user = await User.get(userId)
+            if(!pictureUrl) pictureUrl = user.picture_url
+            if(!nickname) nickname = user.username
 
-        const serverResult = await db.query(`
-                SELECT server_id as "id"
-                FROM roles
-                WHERE id = $1
-        `,[roleId])
+            const roleResult = await db.query(`
+                    SELECT
+                        id,
+                        is_admin,
+                        title,
+                        color,
+                        server_id
+                    FROM roles
+                    WHERE id = $1
+            `, [roleId])
 
-        const serverInfo = serverResult.rows[0]
-
-        const memberResult = await db.query(`
-                INSERT INTO memberships (
-                    user_id,
-                    role_id,
-                    picture_url,
-                    nickname,
-                    joining_date,
-                    server_id
-                )
-                VALUES ($1, $2, $3, $4, $5, $6)
-                RETURNING
-                    id,
-                    user_id,
-                    nickname,
-                    role_id,
-                    server_id,
-                    joining_date,
-                    picture_url
-        `, [
-            userId,
-            roleId,
-            pictureUrl,
-            user.username,
-            now,
-            serverInfo.id
-        ])
-
-        const roleResult = await db.query(`
-                SELECT id, is_admin, title
-                FROM roles
-                WHERE id = $1
-        `, [roleId])
-
-        const membership = memberResult.rows[0]
-        const role = roleResult.rows[0]
-
-        return {
-            id:membership.id,
-            user_id:membership.user_id,
-            picture_url:membership.picture_url,
-            nickname:membership.nickname,
-            joining_date:membership.joining_date,
-            server_id:membership.server_id,
-            role: {
-                id:role.id,
-                is_admin:role.is_admin,
-                title:role.title
+            if(!roleResult.rows.length) {
+                throw new NotFoundError("role not found")
             }
-        }
+            else if(serverId !== roleResult.rows[0].server_id) {
+                throw new ForbiddenError("role not on server")
+            }
+
+            const memberResult = await db.query(`
+                    INSERT INTO memberships (
+                        user_id,
+                        role_id,
+                        picture_url,
+                        nickname,
+                        joining_date,
+                        server_id
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6)
+                    RETURNING
+                        id,
+                        user_id,
+                        nickname,
+                        role_id,
+                        server_id,
+                        joining_date,
+                        picture_url
+            `, [
+                userId,
+                roleId,
+                pictureUrl,
+                nickname,
+                now,
+                serverId
+            ])
+
+            const membership = memberResult.rows[0]
+            const role = roleResult.rows[0]
+
+            return {
+                id:membership.id,
+                user_id:membership.user_id,
+                picture_url:membership.picture_url,
+                nickname:membership.nickname,
+                joining_date:membership.joining_date,
+                server_id:membership.server_id,
+                role: {
+                    id:role.id,
+                    is_admin:role.is_admin,
+                    title:role.title,
+                    color:intToColor(role.color)
+                }
+            }
     };
 
     /** Finds members by server
@@ -333,6 +341,9 @@ class Membership {
                 WHERE m.id = $1
         `, [id])
 
+        if(!result.rows.length) {
+            throw new NotFoundError("membership not found")
+        }
         const membershipInfo = result.rows[0]
 
         return {
@@ -358,7 +369,70 @@ class Membership {
             }
         }
     };
+    /**Updates the membership
+     *
+     * expects: {nickname, roleId}
+     * returns: {
+     *              id,
+     *              user_id,
+     *              server_id,
+     *              nickname,
+     *              role:{
+     *                  id,
+     *                  title,
+     *                  color,
+     *                  is_admin
+     *              }
+     * }
+     */
 
+    static async update(id, {nickname, roleId, pictureUrl}) {
+
+
+        const {setCols, values} = sqlForPartialUpdate(
+            {nickname, roleId, pictureUrl},
+            {
+                nickname:"nickname",
+                roleId:"role_id",
+                pictureUrl:"picture_url"
+            }
+        )
+
+        if(!setCols.length) throw new BadRequestError("no valid data passed")
+
+        const querySet = `
+                UPDATE memberships
+                SET ${setCols}
+                WHERE id = $${values.length+1}
+                RETURNING
+                    id,
+                    user_id,
+                    server_id,
+                    nickname,
+                    role_id,
+                    picture_url
+        `
+
+        const result = await db.query(querySet, [...values, id])
+        const roleResult = await db.query(`
+                SELECT
+                    id,
+                    title,
+                    is_admin,
+                    color
+                FROM roles
+                WHERE id = $1
+        `,[result.rows[0].role_id])
+
+        console.log([result.rows, roleResult.rows])
+
+        const color = intToColor(roleResult.rows[0].color)
+        const membership = result.rows[0]
+        const role = {...roleResult.rows[0], color}
+
+
+        return {...membership, role}
+    }
     /** Updates the member's nickname
      *
      * returns {id, user_id, server_id, role_id, nickname}

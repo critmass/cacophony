@@ -8,12 +8,11 @@ const morgan = require("morgan");
 
 const { NotFoundError } = require("./expressError")
 
-const { authenticateJWT } = require("./middleware/auth");
 const authRoutes = require("./routes/auth")
 const usersRoutes = require("./routes/users")
 const serversRoutes = require("./routes/servers");
-
-
+const { authenticateJWT } = require("./middleware/auth");
+const { updateLastOn } = require("./database_models/User");
 
 const app = express()
 
@@ -21,10 +20,18 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(authenticateJWT)
+app.use(async (req, res, next) => {
+    try {
+        if(res.locals.user) await updateLastOn(res.locals.user.id)
+        return next()
+    } catch (err) {
+        next(err)
+    }
+})
 
-app.use("/servers", serversRoutes)
-app.use("/users", usersRoutes)
 app.use("/auth", authRoutes)
+app.use("/users", usersRoutes)
+app.use("/servers", serversRoutes)
 
 
 // the two error handlers below were lifted from the express-jobly project

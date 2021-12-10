@@ -8,7 +8,8 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const Membership = require("../database_models/Membership");
-const { UnauthorizedError, NotFoundError } = require("../expressError");
+const Role = require("../database_models/Role");
+const { UnauthorizedError, NotFoundError, ForbiddenError} = require("../expressError");
 
 
 /** Middleware: Authenticate user.
@@ -49,7 +50,7 @@ const ensureLoggedIn = (req, res, next) => {
 
 const ensureIsSiteAdmin = (req, res, next) => {
   try {
-    if (!res.locals.user || !res.locals.user.isSiteAdmin) {
+    if (!res.locals.user || !res.locals.user.is_site_admin) {
       throw new UnauthorizedError();
     }
     return next();
@@ -79,7 +80,7 @@ const ensureSiteAdminOrCurrentUser = (req, res, next) => {
 
     if(user) {
       if(
-        user.isSiteAdmin ||
+        user.is_site_admin ||
         user.id === parseInt(req.params.userId,10)
       ) return next()
     }
@@ -91,80 +92,29 @@ const ensureSiteAdminOrCurrentUser = (req, res, next) => {
 
 }
 
-const ensureIsServerMember = async (req, res, next ) => {
+const ensureIsServerMember = (req, res, next ) => {
   try {
-    const members = await Membership.findByServer(req.params.serverId)
-    if(!members.length) throw new NotFoundError("server not found")
-    const membership = members.find( member => {
-      if(member.user_id === res.locals.user.id) return member
+    const serverId = parseInt(req.params.serverId, 10)
+    const membership = res.locals.user.memberships.find(member => {
+      if(member.server_id === serverId) return member
     })
-    if(!membership) throw new UnauthorizedError("not authorized")
-    return next()
+    if(membership) return next()
+    else throw new UnauthorizedError("not a member of this server")
+
   } catch (err) {
     next(err)
   }
 }
 
-const ensureIsServerAdmin = async (req, res, next ) => {
+const ensureIsServerAdmin = (req, res, next) => {
   try {
-    const members = await Membership.findByServer(req.params.serverId)
-    if(!members.length){
-      throw new NotFoundError("server not found")
-    }
-    const membership = members.find( member => {
-      if(member.user_id === res.locals.user.id) return member
+    const memberships = res.locals.user.memberships
+    const serverId = parseInt(req.params.serverId, 10)
+    const member = memberships.find( membership => {
+      if(membership.server_id === serverId) return membership
     })
-    if(!membership || !membership.role.is_admin){
-      throw new UnauthorizedError("not authorized")
-    }
-    return next()
-  } catch (err) {
-    next(err)
-  }
-}
-const ensureIsServerAdminOrCurrentUser = async (req, res, next ) => {
-  try {
-    const members = await Membership.findByServer(req.params.serverId)
-    if(!members.length) throw new NotFoundError("server not found")
-    const membership = members.find( member => {
-      if(member.user_id === res.locals.user.id) return member
-    })
-    if(!membership) throw new UnauthorizedError("not authorized")
-    if(
-      !membership.role.is_admin &&
-      membership.user_id !== res.locals.user.id
-    )  throw new UnauthorizedError("not authorized")
-    return next()
-  } catch (err) {
-    next(err)
-  }
-}
-
-const ensureIsMemberOrSiteAdmin = async (req, res, next ) => {
-  try {
-    if(res.locals.user.isSiteAdmin) return next()
-    const members = await Membership.findByServer(req.params.serverId)
-    if(!members.length) throw new NotFoundError("server not found")
-    const membership = members.find( member => {
-      if(member.user_id === res.locals.user.id) return member
-    })
-    if(!membership) throw new UnauthorizedError("not authorized")
-    return next()
-  } catch (err) {
-    next(err)
-  }
-}
-
-const ensureIsServerOrSiteAdmin = async (req, res, next ) => {
-  try {
-    if (res.locals.user.isSiteAdmin) return next()
-    const members = await Membership.findByServer(req.params.serverId)
-    if(!members.length) throw new NotFoundError("server not found")
-    const membership = members.find( member => {
-      if(member.user_id === res.locals.user.id) return member
-    })
-    if(!membership || !membership.role.is_admin){
-      throw new UnauthorizedError("not authorized")
+    if(!member || !member.is_admin){
+      throw new UnauthorizedError("unathorized, not an admin")
     }
     return next()
   } catch (err) {
@@ -172,18 +122,68 @@ const ensureIsServerOrSiteAdmin = async (req, res, next ) => {
   }
 }
 
+const ensureIsServerAdminOrCurrentUser = (req, res, next) => {
+  try {
+    const memberships = res.locals.user.memberships
+    const serverId = parseInt(req.params.serverId, 10)
+    const member = memberships.find(membership => {
+      if (membership.server_id === serverId) return membership
+    })
+    if (member) {
+      if(member.is_admin) return next()
+      else if(parseInt(req.params.memberId, 10) === member.id) {
+        return next()
+      }
+    }
+    throw new UnauthorizedError("unathorized, not an admin")
+  } catch (err) {
+    next(err)
+  }
+}
 
+const ensureIsMemberOrSiteAdmin = (req, res, next) => {
+  try {
+    const memberships = res.locals.user.memberships
+    const serverId = parseInt(req.params.serverId, 10)
+    const member = memberships.find(membership => {
+      if (membership.server_id === serverId) return membership
+    })
+    if (member || res.locals.user.is_site_admin) {
+      return next()
+    }
+    throw new UnauthorizedError("unathorized, not an admin")
+  } catch (err) {
+    next(err)
+  }
+}
+
+const ensureIsServerOrSiteAdmin = (req, res, next) => {
+  try {
+    if(res.locals.user.is_site_admin) return next()
+    const memberships = res.locals.user.memberships
+    const serverId = parseInt(req.params.serverId, 10)
+    const member = memberships.find(membership => {
+      if (membership.server_id === serverId) return membership
+    })
+    if (!member || !member.is_admin) {
+      throw new UnauthorizedError("unathorized, not an admin")
+    }
+    return next()
+  } catch (err) {
+    next(err)
+  }
+}
 
 
 module.exports = {
-  authenticateJWT,
   ensureLoggedIn,
+  authenticateJWT,
   ensureIsSiteAdmin,
   ensureIsCurrentUser,
-  ensureSiteAdminOrCurrentUser,
-  ensureIsServerMember,
   ensureIsServerAdmin,
+  ensureIsServerMember,
   ensureIsMemberOrSiteAdmin,
   ensureIsServerOrSiteAdmin,
+  ensureSiteAdminOrCurrentUser,
   ensureIsServerAdminOrCurrentUser
 };

@@ -7,11 +7,7 @@ const jsonschema = require("jsonschema");
 const Role = require("../database_models/Role");
 const newRoleSchema = require("../json_schema/roleNew.json");
 const updateRoleSchema = require("../json_schema/roleUpdate.json")
-const newAccessSchema = require("../json_schema/roleNewAccess.json")
-const { BadRequestError, NotFoundError, ForbiddenError } = require("../expressError");
-const { intToColor } = require("../helpers/colorConverter");
-const { checkIfRoleIsOnSever } = require("../helpers/roleHelpers");
-
+const { BadRequestError } = require("../expressError");
 
 /** POST / {title, color:{r,g,b}, isAdmin} =>
  *                                  {
@@ -78,8 +74,6 @@ const getRoles = async (req, res, next) => {
 
 const getRole = async (req, res, next) => {
     try {
-        await checkIfRoleIsOnSever(
-            parseInt(req.params.serverId), parseInt(req.params.roleId))
         const role = await Role.get(req.params.roleId)
         return res.status(200).json({role})
     } catch (err) {
@@ -105,9 +99,6 @@ const patchRole = async (req, res, next) => {
         const validator = jsonschema.validate(req.body, updateRoleSchema)
         if(!validator.valid) throw new BadRequestError()
 
-        await checkIfRoleIsOnSever(
-            parseInt(req.params.serverId),parseInt(req.params.roleId))
-
         const role = await Role.update(req.params.roleId, req.body)
 
         return res.status(201).json({role})
@@ -130,8 +121,6 @@ const patchRole = async (req, res, next) => {
 
 const deleteRole =  async (req, res, next) => {
     try {
-        await checkIfRoleIsOnSever(
-            parseInt(req.params.serverId), parseInt(req.params.roleId))
         const role = await Role.remove(req.params.roleId)
         return res.status(201).json({role})
     } catch (err) {

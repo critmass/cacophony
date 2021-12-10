@@ -25,7 +25,7 @@ describe("POST /servers", () => {
         pictureUrl:"newImage.jpg"
     }
     it("creates a new server if sent by a valid user", async () => {
-        const resp = await request(app)
+       const resp = await request(app)
                                     .post("/servers")
                                     .send(newServer)
                                     .set(
@@ -110,7 +110,6 @@ describe("GET /servers/:serverId", () => {
                                         "authorization",
                                         `Bearer ${user4Token}`
                                     )
-        // console.log(resp)
         expect(resp.status).toBe(401)
     })
     it("returns 404 if server is not found", async () => {

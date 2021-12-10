@@ -1,14 +1,14 @@
 {
     "type":"object",
     "required":[
-        "user_id",
-        "role_id"
+        "userId",
+        "roleId"
     ],
     "properties":{
-        "user_id":{
+        "userId":{
             "type":"integer"
         },
-        "role_id":{
+        "roleId":{
             "type":"integer"
         }
     }

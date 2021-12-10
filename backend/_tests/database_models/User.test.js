@@ -25,8 +25,7 @@ describe("Authenticate User", () => {
     it("works to log someone in", async () => {
         const user = await User.authenticate('u1', 'password1')
         expect(user.username).toBe('u1')
-        expect(user.picture_url).toBe(defaultImgURL)
-        expect(user.joining_date).toEqual(defaultTime)
+        expect(user.memberships instanceof Array).toBeTruthy()
     })
     it("doesn't login if user doesn't exist", async () => {
         try {

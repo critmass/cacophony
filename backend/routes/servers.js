@@ -11,7 +11,7 @@ const Room = require("../database_models/Room");
 
 const express = require("express")
 const router = express.Router();
-const { BadRequestError, NotFoundError } = require("../expressError");
+const { BadRequestError } = require("../expressError");
 const {
     createRoom,
     getRooms,
@@ -34,13 +34,19 @@ const {
     deleteMembership
 } = require("../services/memberships");
 const {
-    ensureLoggedIn, ensureIsMemberOrSiteAdmin, ensureIsServerAdmin, ensureIsServerOrSiteAdmin, ensureIsServerMember, ensureIsServerAdminOrCurrentUser
+    ensureLoggedIn,
+    ensureIsMemberOrSiteAdmin,
+    ensureIsServerAdmin,
+    ensureIsServerOrSiteAdmin,
+    ensureIsServerMember,
+    ensureIsServerAdminOrCurrentUser
 } = require("../middleware/auth");
 
 const serverNewSchema = require("../json_schema/serverNew.json")
 const serverUpdateSchema = require("../json_schema/serverUpdate.json");
-const User = require("../database_models/User");
-const { throws } = require("assert");
+const {
+    doesServerExist, isRoleOnServer, isMembershipOnServer
+} = require("../middleware/structure");
 
 
 /** POST / {
@@ -65,7 +71,7 @@ const { throws } = require("assert");
  *                         name,
  *                         picture_url,
  *                         start_date,
- *                         roles:[{id, title, color}, ...]
+ *                         roles:[{id, title, color, is_admin}, ...]
  *                         rooms:[{id, name, type}]
  *                  }
  *              }
@@ -84,10 +90,11 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
             {title:"admin" , serverId:server.id, isAdmin:true })
         const memberRole = await Role.create(
             {title:"member", serverId:server.id, isAdmin:false})
-        const membership = await Membership.create(
-                                                    res.locals.user.id,
-                                                    adminRole.id
-                                                )
+        const membership = await Membership.create({
+            userId:res.locals.user.id,
+            roleId:adminRole.id,
+            serverId:server.id
+        })
         const room = await Room.create("Main Room", server.id)
         await Role.addAccess(adminRole.id, room.id, true)
         const data = {
@@ -145,35 +152,36 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
  *                     }}
  * */
 
-router.get("/:serverId", ensureIsMemberOrSiteAdmin, async (req, res, next) => {
-    try {
-        const serverInfo = await Server.get(req.params.serverId)
-        // console.info(serverInfo)
-        const roleMap = serverInfo.roles.reduce( (map, role) => {
-            map.set(role.id, role)
-            return map
-        }, new Map())
-        const server = {
-            id:serverInfo.id,
-            name:serverInfo.name,
-            picture_url:serverInfo.picture_url,
-            members:serverInfo.members.map( member => {
-                return {
-                    id:member.id,
-                    nickname:member.nickname,
-                    role:roleMap.get(member.role_id),
-                    picture_url:member.picture_url,
-                    joining_date:member.joining_date
-                }
-            }),
-            rooms:serverInfo.rooms
-        }
-        // console.info(server)
+router.get("/:serverId",
+    doesServerExist,
+    ensureIsMemberOrSiteAdmin,
+    async (req, res, next) => {
+        try {
+            const serverInfo = await Server.get(req.params.serverId)
+            const roleMap = serverInfo.roles.reduce( (map, role) => {
+                map.set(role.id, role)
+                return map
+            }, new Map())
+            const server = {
+                id:serverInfo.id,
+                name:serverInfo.name,
+                picture_url:serverInfo.picture_url,
+                members:serverInfo.members.map( member => {
+                    return {
+                        id:member.id,
+                        nickname:member.nickname,
+                        role:roleMap.get(member.role_id),
+                        picture_url:member.picture_url,
+                        joining_date:member.joining_date
+                    }
+                }),
+                rooms:serverInfo.rooms
+            }
 
-        return res.status(200).json({server})
-    } catch (err) {
-        next(err)
-    }
+            return res.status(200).json({server})
+        } catch (err) {
+            next(err)
+        }
 })
 
 /** PATCH /[serverId] {
@@ -187,17 +195,20 @@ router.get("/:serverId", ensureIsMemberOrSiteAdmin, async (req, res, next) => {
  *                     }}
  * */
 
-router.patch("/:serverId", ensureIsServerAdmin, async (req, res, next) => {
-    try {
-        const validator = jsonschema.validate(
-                                        req.body, serverUpdateSchema)
-        if(!validator.valid) throw new BadRequestError()
+router.patch("/:serverId",
+    doesServerExist,
+    ensureIsServerAdmin,
+    async (req, res, next) => {
+        try {
+            const validator = jsonschema.validate(
+                                            req.body, serverUpdateSchema)
+            if(!validator.valid) throw new BadRequestError()
 
-        const server = await Server.update(req.params.serverId, req.body)
-        return res.status(201).json({server})
-    } catch (err) {
-        next(err)
-    }
+            const server = await Server.update(req.params.serverId, req.body)
+            return res.status(201).json({server})
+        } catch (err) {
+            next(err)
+        }
 })
 
 /** DELETE /[serverId] => {server:{
@@ -209,7 +220,9 @@ router.patch("/:serverId", ensureIsServerAdmin, async (req, res, next) => {
  *                          }}
  * */
 
-router.delete("/:serverId", ensureIsServerOrSiteAdmin,
+router.delete("/:serverId",
+    doesServerExist,
+    ensureIsServerOrSiteAdmin,
     async (req, res, next) => {
         try {
             const server = await Server.delete(req.params.serverId)
@@ -219,25 +232,58 @@ router.delete("/:serverId", ensureIsServerOrSiteAdmin,
         }
 })
 
-router.post("/:serverId/rooms", ensureIsServerAdmin, createRoom)
-router.get("/:serverId/rooms", ensureIsServerMember, getRooms)
-router.get("/:serverId/rooms/:roomId", ensureIsServerMember,  getRoom)
-router.patch("/:serverId/rooms/:roomId", ensureIsServerAdmin, patchRoom)
-router.delete("/:serverId/rooms/:roomId", ensureIsServerAdmin, deleteRoom)
+// rooms routes
+router.post("/:serverId/rooms",
+    doesServerExist, ensureIsServerAdmin, createRoom)
+router.get("/:serverId/rooms",
+    doesServerExist, ensureIsServerMember, getRooms)
+router.get("/:serverId/rooms/:roomId",
+    doesServerExist, ensureIsServerMember, getRoom)
+router.patch("/:serverId/rooms/:roomId",
+    doesServerExist, ensureIsServerAdmin, patchRoom)
+router.delete("/:serverId/rooms/:roomId",
+    doesServerExist, ensureIsServerAdmin, deleteRoom)
 
-router.post("/:serverId/roles", ensureIsServerAdmin, createRole)
-router.get("/:serverId/roles", ensureIsServerMember, getRoles)
-router.get("/:serverId/roles/:roleId", ensureIsServerAdmin, getRole)
-router.patch("/:serverId/roles/:roleId", ensureIsServerAdmin, patchRole)
-router.delete("/:serverId/roles/:roleId", ensureIsServerAdmin, deleteRole)
+// roles routes
+router.post("/:serverId/roles",
+    doesServerExist, ensureIsServerAdmin, createRole)
+router.get("/:serverId/roles",
+    doesServerExist, ensureIsServerMember, getRoles)
+router.get("/:serverId/roles/:roleId",
+    doesServerExist, isRoleOnServer, ensureIsServerAdmin, getRole)
+router.patch("/:serverId/roles/:roleId",
+    doesServerExist, isRoleOnServer, ensureIsServerAdmin, patchRole)
+router.delete("/:serverId/roles/:roleId",
+    doesServerExist, isRoleOnServer, ensureIsServerAdmin, deleteRole)
 
-router.post("/:serverId/members", ensureIsServerAdmin, createMembership)
-router.get("/:serverId/members", ensureIsServerMember, getMembers)
+// members routes
+router.post("/:serverId/members",
+    doesServerExist,
+    ensureIsServerAdmin,
+    createMembership
+)
+router.get("/:serverId/members",
+    doesServerExist,
+    ensureIsMemberOrSiteAdmin,
+    getMembers
+)
 router.get("/:serverId/members/:memberId",
-                ensureIsServerMember, getMembership)
+    doesServerExist,
+    isMembershipOnServer,
+    ensureIsServerMember,
+    getMembership
+)
 router.patch("/:serverId/members/:memberId",
-                ensureIsServerAdminOrCurrentUser, patchMembership)
+    doesServerExist,
+    isMembershipOnServer,
+    ensureIsServerAdminOrCurrentUser,
+    patchMembership
+)
 router.delete("/:serverId/members/:memberId",
-                ensureIsServerAdminOrCurrentUser, deleteMembership)
+    doesServerExist,
+    isMembershipOnServer,
+    ensureIsServerAdminOrCurrentUser,
+    deleteMembership
+)
 
 module.exports = router

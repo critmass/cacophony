@@ -128,6 +128,15 @@ describe("GET /servers/:serverId/roles/:roleId", () => {
                                     "authorization",
                                     `Bearer ${user1Token}`
                                 )
+        expect(resp.status).toBe(403)
+    })
+    it("should return 404 if role not found", async () => {
+        const resp = await request(app)
+                                .get("/servers/1/roles/5000")
+                                .set(
+                                    "authorization",
+                                    `Bearer ${user1Token}`
+                                )
         expect(resp.status).toBe(404)
     })
     it("should return 404 if server not found", async () => {
@@ -180,9 +189,19 @@ describe("PATCH /servers/:serverId/roles/:roleId", () => {
                                 )
         expect(resp1.status).toBe(401)
     })
-    it("should return 404 status if role not on server", async () => {
+    it("should return 403 status if role not on server", async () => {
         const resp = await request(app)
                                 .patch("/servers/1/roles/5")
+                                .send(newRole)
+                                .set(
+                                    "authorization",
+                                    `Bearer ${user1Token}`
+                                )
+        expect(resp.status).toBe(403)
+    })
+    it("should return 404 status if role not found", async () => {
+        const resp = await request(app)
+                                .patch("/servers/1/roles/5000")
                                 .send(newRole)
                                 .set(
                                     "authorization",
@@ -235,6 +254,15 @@ describe("DELETE /servers/:serverId/roles/:roleId", () => {
     it("should return 404 status if role not on server", async () => {
         const resp = await request(app)
                                 .delete("/servers/1/roles/5")
+                                .set(
+                                    "authorization",
+                                    `Bearer ${user1Token}`
+                                )
+        expect(resp.status).toBe(403)
+    })
+    it("should return 404 status if role not found", async () => {
+        const resp = await request(app)
+                                .delete("/servers/1/roles/5000")
                                 .set(
                                     "authorization",
                                     `Bearer ${user1Token}`
