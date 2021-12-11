@@ -45,7 +45,10 @@ const {
 const serverNewSchema = require("../json_schema/serverNew.json")
 const serverUpdateSchema = require("../json_schema/serverUpdate.json");
 const {
-    doesServerExist, isRoleOnServer, isMembershipOnServer
+    isRoomOnServer,
+    isRoleOnServer,
+    doesServerExist,
+    isMembershipOnServer
 } = require("../middleware/structure");
 
 
@@ -95,7 +98,8 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
             roleId:adminRole.id,
             serverId:server.id
         })
-        const room = await Room.create("Main Room", server.id)
+        const room = await Room.create(
+                                {name:"Main Room", serverId:server.id})
         await Role.addAccess(adminRole.id, room.id, true)
         const data = {
                 membership,
@@ -238,11 +242,11 @@ router.post("/:serverId/rooms",
 router.get("/:serverId/rooms",
     doesServerExist, ensureIsServerMember, getRooms)
 router.get("/:serverId/rooms/:roomId",
-    doesServerExist, ensureIsServerMember, getRoom)
+    doesServerExist, isRoomOnServer, ensureIsServerMember, getRoom)
 router.patch("/:serverId/rooms/:roomId",
-    doesServerExist, ensureIsServerAdmin, patchRoom)
+    doesServerExist, isRoomOnServer, ensureIsServerAdmin, patchRoom)
 router.delete("/:serverId/rooms/:roomId",
-    doesServerExist, ensureIsServerAdmin, deleteRoom)
+    doesServerExist, isRoomOnServer, ensureIsServerAdmin, deleteRoom)
 
 // roles routes
 router.post("/:serverId/roles",

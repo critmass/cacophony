@@ -52,13 +52,13 @@ const commonBeforeAll = async () => {
     await Server.create({name:"server2", pictureUrl:defaultImgURL}) //ID:2
     await Server.create({name:"server3", pictureUrl:defaultImgURL}) //ID:3
 
-    await Room.create("room11", 1) //ID:1
-    await Room.create("room12", 1) //ID:2
-    await Room.create("room21", 2) //ID:3
-    await Room.create("room22", 2) //ID:4
-    await Room.create("room31", 3) //ID:5
-    await Room.create("room32", 3) //ID:6
-    await Room.create("room13", 1) //ID:7
+    await Room.create({name:"room11", serverId:1}) //ID:1
+    await Room.create({name:"room12", serverId:1}) //ID:2
+    await Room.create({name:"room21", serverId:2}) //ID:3
+    await Room.create({name:"room22", serverId:2}) //ID:4
+    await Room.create({name:"room31", serverId:3}) //ID:5
+    await Room.create({name:"room32", serverId:3}) //ID:6
+    await Room.create({name:"room13", serverId:1}) //ID:7
 
     /** ID:1 */
     await Role.create({

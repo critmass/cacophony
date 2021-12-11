@@ -7,7 +7,10 @@ const {
     commonBeforeAll,
     commonBeforeEach,
     commonAfterEach,
-    commonAfterAll
+    commonAfterAll,
+    user1Token,
+    user2Token,
+    user5Token
 } = require("../routes/_testCommon");
 
 beforeAll(commonBeforeAll)
@@ -90,7 +93,7 @@ describe("GET /servers/:serverId/rooms/:roomId", () => {
                                     `Bearer ${user2Token}`
                                 )
         expect(resp.status).toBe(200)
-        expect(resp.body.room.name).toBe(newRoom.name)
+        expect(resp.body.room.name).toBe("room11")
     })
     it("should return 404 status code if user is not a member", async () => {
         const resp = await request(app)
@@ -101,9 +104,18 @@ describe("GET /servers/:serverId/rooms/:roomId", () => {
                                 )
         expect(resp.status).toBe(401)
     })
-    it("should return 404 status code room is not on server", async () => {
+    it("should return 403 status code room is not on server", async () => {
         const resp = await request(app)
                                 .get("/servers/1/rooms/5")
+                                .set(
+                                    "authorization",
+                                    `Bearer ${user2Token}`
+                                )
+        expect(resp.status).toBe(403)
+    })
+    it("should return 404 status code room is not found", async () => {
+        const resp = await request(app)
+                                .get("/servers/1/rooms/5000")
                                 .set(
                                     "authorization",
                                     `Bearer ${user2Token}`
@@ -131,7 +143,7 @@ describe("PATCH /servers/:serverId/rooms/:roomId", () => {
                                     "authorization",
                                     `Bearer ${user1Token}`
                                 )
-        expect(resp.status).toBe(200)
+        expect(resp.status).toBe(201)
         expect(resp.body.room.name).toBe(updatedRoom.name)
     })
     it("should return 401 if user isn't a server admin", async () => {
@@ -144,9 +156,19 @@ describe("PATCH /servers/:serverId/rooms/:roomId", () => {
                                 )
         expect(resp.status).toBe(401)
     })
-    it("should return 404 if room not on server", async () => {
+    it("should return 403 if room not on server", async () => {
         const resp = await request(app)
                                 .patch("/servers/1/rooms/5")
+                                .send(updatedRoom)
+                                .set(
+                                    "authorization",
+                                    `Bearer ${user1Token}`
+                                )
+        expect(resp.status).toBe(403)
+    })
+    it("should return 404 if room not found", async () => {
+        const resp = await request(app)
+                                .patch("/servers/1/rooms/5000")
                                 .send(updatedRoom)
                                 .set(
                                     "authorization",
@@ -174,8 +196,8 @@ describe("DELETE /servers/:serverId/rooms/:roomId", () => {
                                     "authorization",
                                     `Bearer ${user1Token}`
                                 )
-        expect(resp.status).toBe(200)
-        expect(resp.body.room.name).toBe(newRoom.name)
+        expect(resp.status).toBe(201)
+        expect(resp.body.room.name).toBe("room11")
     })
     it("should return 401 status if the user is not a server admin", async () => {
         const resp = await request(app)
@@ -186,18 +208,27 @@ describe("DELETE /servers/:serverId/rooms/:roomId", () => {
                                 )
         expect(resp.status).toBe(401)
     })
-    it("should return 404 status if room not on server", async () => {
+    it("should return 403 status if room not on server", async () => {
         const resp = await request(app)
                                 .delete("/servers/1/rooms/5")
                                 .set(
                                     "authorization",
                                     `Bearer ${user1Token}`
                                 )
-        expect(resp.status).toBe(404)
+        expect(resp.status).toBe(403)
     })
     it("should return 404 status if server not found", async () => {
         const resp = await request(app)
                                 .delete("/servers/5000/rooms/1")
+                                .set(
+                                    "authorization",
+                                    `Bearer ${user1Token}`
+                                )
+        expect(resp.status).toBe(404)
+    })
+    it("should return 404 status if room not found", async () => {
+        const resp = await request(app)
+                                .delete("/servers/1/rooms/5000")
                                 .set(
                                     "authorization",
                                     `Bearer ${user1Token}`

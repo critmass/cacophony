@@ -195,7 +195,6 @@ describe("PATCH /servers/:serverId/members/:memberId", () => {
                                         "authorization",
                                         `Bearer ${user1Token}`
                                     )
-            console.log(resp.error)
             expect(resp.status).toBe(201)
             expect(resp.body.membership.id).toBe(1)
             expect(resp.body.membership.nickname).toBe("new name")
@@ -210,7 +209,6 @@ describe("PATCH /servers/:serverId/members/:memberId", () => {
                                         "authorization",
                                         `Bearer ${user1Token}`
                                     )
-            console.log(resp.error)
             expect(resp.status).toBe(201)
             expect(resp.body.membership.id).toBe(1)
             expect(resp.body.membership.picture_url).toBe("newImage.jpg")

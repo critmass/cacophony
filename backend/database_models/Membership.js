@@ -424,8 +424,6 @@ class Membership {
                 WHERE id = $1
         `,[result.rows[0].role_id])
 
-        console.log([result.rows, roleResult.rows])
-
         const color = intToColor(roleResult.rows[0].color)
         const membership = result.rows[0]
         const role = {...roleResult.rows[0], color}

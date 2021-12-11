@@ -52,21 +52,30 @@ describe("Get Room", () => {
 
 describe("Create Room", () => {
     it("creates a new room", async () => {
-        const room = await Room.create("new_room", 1, "text")
+        const room = await Room.create(
+                        {name:"new_room", serverId:1, type:"text"})
         expect(room.server_id).toBe(1)
         expect(room.name).toBe('new_room')
         expect(room.type).toBe("text")
     })
+    it("creates a new room even if the name is the same as " +
+        "one on another server", async () => {
+            const room = await Room.create(
+                            {name:"room11", serverId:2})
+            expect(room.server_id).toBe(2)
+            expect(room.name).toBe('room11')
+            expect(room.type).toBe("text")
+    })
     it("throws an error if server doesn't exist", async () => {
         try {
-            await Room.create("not_a_room", 5000)
+            await Room.create({name:"not_a_room", serverId:5000})
         } catch (err) {
             expect(err instanceof Error).toBeTruthy()
         }
     })
     it("throws an error if server already has a room with the same name", async () => {
         try {
-            await Room.create('room11', 1)
+            await Room.create({name:'room11', serverId:1})
         } catch (err) {
             expect(err instanceof Error).toBeTruthy()
         }

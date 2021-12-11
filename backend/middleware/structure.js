@@ -1,5 +1,6 @@
 const Membership = require("../database_models/Membership")
 const Role = require("../database_models/Role")
+const Room = require("../database_models/Room")
 const Server = require("../database_models/Server")
 const { NotFoundError, ForbiddenError } = require("../expressError")
 
@@ -28,6 +29,20 @@ const isRoleOnServer = async (req, res, next) => {
     }
 }
 
+const isRoomOnServer = async (req, res, next) => {
+    try {
+        const {server_id} = await Room.get(req.params.roomId)
+        if(server_id) {
+            const serverId = parseInt(req.params.serverId, 10)
+            if(serverId === server_id) return next()
+            else throw new ForbiddenError("room is not on server")
+        }
+        else throw new NotFoundError("room doesn't exist")
+    } catch (err) {
+        next(err)
+    }
+}
+
 const isMembershipOnServer = async (req, res, next) => {
     try {
         const {server_id} = await Membership.get(req.params.memberId)
@@ -42,4 +57,9 @@ const isMembershipOnServer = async (req, res, next) => {
     }
 }
 
-module.exports = { doesServerExist, isRoleOnServer, isMembershipOnServer }
+module.exports = {
+    doesServerExist,
+    isRoleOnServer,
+    isRoomOnServer,
+    isMembershipOnServer
+}

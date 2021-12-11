@@ -1,6 +1,7 @@
 "use strict";
 
-const db = require("../db")
+const db = require("../db");
+const { NotFoundError } = require("../expressError");
 
 /** Related functions for rooms */
 
@@ -8,12 +9,12 @@ class Room {
 
     /** Creates a room (from data), update db, return new room data.
      *
-     * data should be { name, server_id, type }
+     * data should be { name, serverId, type }
      *
      * returns { id, name, server_id, type }
      */
 
-    static async create(name, serverId, type="text") {
+    static async create({name, serverId, type="text"}) {
 
         const result = await db.query(`
                 INSERT INTO rooms (
@@ -96,6 +97,8 @@ class Room {
 
         `, [id])
 
+        if(!result.rows.length) throw new NotFoundError("room not found")
+
         const roomInfo = {
             id:result.rows[0].id,
             name:result.rows[0].name,
@@ -149,6 +152,23 @@ class Room {
             })
         }
     };
+
+    /** Update rome with id (presently only allows updating name)
+     *
+     * returns { id, name, server_id, type }
+    */
+
+    static async update(id, {name}) {
+
+        const result = await db.query(`
+                UPDATE rooms
+                SET name = $2
+                WHERE id = $1
+                RETURNING id, name, server_id, type
+        `,[id, name])
+
+        return result.rows[0]
+    }
 
     /** Removes room with id from database, returns the room data
      *

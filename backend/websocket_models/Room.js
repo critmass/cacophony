@@ -1,6 +1,7 @@
 /** Chat rooms that can be joined/left/broadcast to. */
 
-const DatabaseRoom = require("../database_models/Room")
+const DatabaseRoom = require("../database_models/Room");
+const { UnauthorizedError } = require("../expressError");
 
 // in-memory storage of roomId -> room
 
@@ -44,10 +45,11 @@ class Room {
         this.id = roomData.id
         this.name = roomData.name
         this.type = roomData.type
-        this.members = roomData.members
-        this.members.forEach( member => {
-            member.online = false
-        });
+        this.members = new Map()
+        roomData.members.forEach( member => {
+            this.members.set(member.id, member)
+        })
+        this.membersOnline = new Map()
     }
 
     /** member joining a room, if not on the accepted member
@@ -55,17 +57,28 @@ class Room {
      * list, changes the member status from offline to online.
      * */
 
-    async join(member_id) {}
+    async join(member) {
+        if(this.members.has(member.id)) {
+            this.membersOnline.set(member.id, member)
+        }
+        throw new UnauthorizedError("not allowed")
+    }
 
     /** member status changed from online to offline.  If the last member
      * leaves it deletes the room from ROOMS.
      */
 
-    async leave(member_id) {}
+    async leave(member) {
+        this.membersOnline.delete(member.id)
+    }
 
     /** sends the new post to everyone currently logged-in to the room. */
 
-    async broadcast(post) {}
+    async broadcast(post) {
+        this.membersOnline.forEach( member => {
+            member.send( JSON.stringify(post) )
+        })
+    }
 
 }
 
