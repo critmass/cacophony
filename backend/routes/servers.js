@@ -41,6 +41,13 @@ const {
     ensureIsServerMember,
     ensureIsServerAdminOrCurrentUser
 } = require("../middleware/auth");
+const {
+    createPost,
+    getPost,
+    getPosts,
+    updatePost,
+    removePost
+} = require("../services/posts")
 
 const serverNewSchema = require("../json_schema/serverNew.json")
 const serverUpdateSchema = require("../json_schema/serverUpdate.json");
@@ -147,12 +154,13 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
  *                              role:{
  *                                  id,
  *                                  title,
- *                                  color
+ *                                  color,
+ *                                  is_admin
  *                              },
  *                              picture_url,
  *                              joining_date
  *                          }, ...],
- *                         rooms:[{room_id, room_name, type}, ...]
+ *                         rooms:[{id, name, type}, ...]
  *                     }}
  * */
 
@@ -247,6 +255,19 @@ router.patch("/:serverId/rooms/:roomId",
     doesServerExist, isRoomOnServer, ensureIsServerAdmin, patchRoom)
 router.delete("/:serverId/rooms/:roomId",
     doesServerExist, isRoomOnServer, ensureIsServerAdmin, deleteRoom)
+
+// post routes
+router.post("/:serverId/rooms/:roomId/posts",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, createPost)
+router.get("/:serverId/rooms/:roomId/posts",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, getPosts)
+router.get("/:serverId/rooms/:roomId/posts/:postId",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, getPosts)
+router.patch("/:serverId/rooms/:roomId/posts/:postId",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, updatePost)
+router.delete("/:serverId/rooms/:roomId/posts/:postId",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, removePost)
+
 
 // roles routes
 router.post("/:serverId/roles",

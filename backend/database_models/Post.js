@@ -14,7 +14,7 @@ class Post {
      * returns { id, member_id, room_id, content, post_date }
      */
 
-    static async create(memberId, roomId, content, threadedFrom=null) {
+    static async create({memberId, roomId, content, threadedFrom=null}) {
 
         const now = new Date()
 

@@ -185,7 +185,7 @@ class Membership {
             return {
                 id: row.id,
                 nickname: row.nickname,
-                user_id: row.user_id,
+                server_id:row.server_id,
                 picture_url: row.picture_url,
                 role: {
                     id: row.role_id,
