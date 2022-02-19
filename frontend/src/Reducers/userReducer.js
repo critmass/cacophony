@@ -11,7 +11,7 @@ const user = (state={...INITIAL_STATE}, action) => {
         case UPDATE_USER:
             return {...state, ...action.updates}
         default:
-            state
+            return state
     }
 }
 

@@ -24,7 +24,7 @@ const memberships = (state=INITIAL_STATE, action) => {
             return [...state, action.membership]
         case REMOVE_MEMBERSHIP:
             return state.filter(membership => {
-                membership.id !== action.memberId
+                return membership.id !== action.memberId
             })
         case CLEAR_MEMBERSHIPS:
             return INITIAL_STATE

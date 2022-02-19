@@ -1,12 +1,13 @@
-import React, { useContext } from "react"
+import React from "react"
+import { useSelector } from "react-redux"
 import { Redirect, Route } from "react-router-dom"
-import DataContext from "../context/DataContext"
+
 
 
 const ProtectedRoute = ({path, exact=false, children}) => {
-    const {currentUsername} = useContext(DataContext)
+    const {username} = useSelector(state => state.user)
     return (<Route exact={exact} path={path}>
-        {currentUsername ?
+        {username ?
             children :
             <Redirect to="/"/>}
     </Route>)

@@ -1,6 +1,5 @@
 import { CLEAR_USER, GET_USER, UPDATE_USER } from "./actionList"
 import CacophonyApi from "../helpers/CacophonyAPI"
-import { useSelector } from "react-redux"
 import { gotMemberships } from "./membershipActionMaker"
 
 
@@ -33,10 +32,9 @@ const updatedUser = updates => {
     return {type:UPDATE_USER, updates}
 }
 
-const updateUser = (updates) => {
-    const {id} = useSelector(state => state.user)
+const updateUser = (updates, userId) => {
     const updateUserWithApi = async dispatch => {
-        const {user} = await CacophonyApi.updateUser(id, updates)
+        const {user} = await CacophonyApi.updateUser(userId, updates)
         const userData = extractUserInfo(user)
         dispatch(updatedUser(userData))
     }

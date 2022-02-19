@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux"
 import CacophonyApi from "../helpers/CacophonyAPI"
 import {
     ADD_SERVER,
@@ -6,7 +5,8 @@ import {
     GET_SERVERS,
     REMOVE_SERVER
 } from "./actionList"
-import { addedMembership, removedMembership } from "./membershipActionMaker"
+import { addedMembership } from "./membershipActionMaker"
+import { getUser } from "./userActionMaker"
 
 const gotServers = servers => {
     return {type:GET_SERVERS, servers}
@@ -42,19 +42,15 @@ const removedServer = serverId => {
     return {type:REMOVE_SERVER, serverId}
 }
 
-const removeServer = serverId => {
-    const memberships = useSelector(state => state.memberships)
+const removeServer = (serverId) => {
     const removeServerFromApi = async dispatch => {
         const success = await CacophonyApi.removeServer(serverId)
         if(success) {
-            const {id} = Object.values(memberships).find(membership => {
-                membership.server.id = serverId
-            })
-            dispatch(removedMembership(id))
             dispatch(removedServer(serverId))
+            dispatch(getUser())
         }
-        return removeServerFromApi
     }
+    return removeServerFromApi
 }
 
 export {

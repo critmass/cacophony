@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux"
 import CacophonyApi from "../helpers/CacophonyAPI"
 import {
     ADD_MEMBERSHIP,
@@ -35,13 +34,13 @@ const addedMembership = membership => {
     return {type:ADD_MEMBERSHIP, membership}
 }
 
-const addMembership = (serverId, roleId, nickname, pictureUrl) => {
-
-    const user = useSelector(state => state.user)
-
-    const userId = user.id
-    if (!nickname) { nickname = user.username }
-    if (!pictureUrl) { pictureUrl = user.picture_url }
+const addMembership = (
+    serverId,
+    roleId,
+    userId,
+    nickname=null,
+    pictureUrl=null
+) => {
 
     const addMembershipToApi = async dispatch => {
         const membership = await CacophonyApi.addMembership(

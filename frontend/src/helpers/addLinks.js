@@ -2,7 +2,7 @@
 
 export const addLink = (element, linkPrefix) => {
     const link = `${linkPrefix}${element.id}`
-    return {...data, link}
+    return {...element, link}
 }
 
 export const addLinks = (data, linkPrefix) => {

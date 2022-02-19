@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
+import ServerPageContext from "../../Context/ServerPageContext";
 
 import Sidebar from "./Sidebar";
 
-const MembersSidebar = ({ Members }) => {
+const MembersSidebar = () => {
+    const {members} = useContext(ServerPageContext)
 
-    return <Sidebar data={Members} className={"ServerSidebar"} />
+    return (<Sidebar data={} className={"MembersSidebar"} />)
 }
 
 export default MembersSidebar

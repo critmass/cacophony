@@ -13,8 +13,17 @@ const getToken = (username, password) => {
     return getTokenFromApi
 }
 
+const getTokenFromRegistration = (username, password, picture_url) => {
+    const getTokenFromApi = async dispatch => {
+        const token = await CacophonyApi.register(
+            username, password, picture_url)
+        dispatch(gotToken(token))
+    }
+    return getTokenFromApi
+}
+
 const clearToken = () => {
     return {type:CLEAR_TOKEN}
 }
 
-export {getToken, clearToken}
+export {getToken, clearToken, getTokenFromRegistration}

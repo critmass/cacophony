@@ -45,6 +45,7 @@ const getRooms =  async (req, res, next) => {
  *                  type,
  *                  members: [{
  *                      id,
+ *                      nickname,
  *                      user_id,
  *                      role_id,
  *                      is_moderator

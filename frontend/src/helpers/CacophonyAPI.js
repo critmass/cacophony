@@ -1,5 +1,4 @@
 import axios from "axios"
-import { useSelector } from "react-redux";
 
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
@@ -7,7 +6,7 @@ const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
 class CacophonyApi {
 
     static token;
-    static serverWebSocket;
+    // static serverWebSocket;
 
     static async request(endpoint, data = {}, method = "get") {
 
@@ -93,14 +92,12 @@ class CacophonyApi {
 
     }
 
-    static async updateMembership(memberId, updates) {
-        const {serverId} = useSelector(state => {
-            return state.memberships.find( membership => {
-                return membership.id === memberId
-            })
-        })
+    static async updateMembership(memberId, serverId, updates) {
+
         const data = await this.request(
-            `servers/${serverId}/memberships/${memberId}`, updates, 'patch'
+            `servers/${serverId}/memberships/${memberId}`,
+            updates,
+            'patch'
         )
         return data.membership
     }
@@ -120,20 +117,18 @@ class CacophonyApi {
         return data.membership
     }
 
-    static async removerMembership(member_id) {
-        const memberships = useSelector(state => state.memberships)
-        const {server_id} = memberships[member_id]
+    static async removerMembership({member_id, server_id}) {
+
         const data = await this.request(
             `servers/${server_id}/memberships/${member_id}`, {}, "delete")
         if(data.membership) return true
         else return false
     }
 
-    static async getMembership(memberId) {
-        const memberships = useSelector(state => state.memberships)
-        const { server_id } = memberships[memberId]
+    static async getMembership({member_id, server_id}) {
+
         const data = await this.request(
-            `servers/${server_id}/memberships/${memberId}`, {}, "get")
+            `servers/${server_id}/memberships/${member_id}`, {}, "get")
         return data.membership
     }
 
@@ -143,13 +138,22 @@ class CacophonyApi {
     }
 
     static async postToRoom(serverId, roomId, post) {
-        const user = useSelector(state => state.user)
+        await this.request(
+            `servers/${serverId}/rooms/${roomId}/post`, {post}, "post")
 
     }
 
     static async login(username, password) {
-        const response = await this.request(`auth/token`, {username, password}, 'post')
+        const response = await this.request(
+            `auth/token`, {username, password}, 'post')
         this.token = response.token
+        return this.token
+    }
+
+    static async register(username, password, picture_url) {
+        const resp = await this.request(
+            `auth/register`, {username, password, picture_url}, "post")
+        this.token = resp.token
         return this.token
     }
 }

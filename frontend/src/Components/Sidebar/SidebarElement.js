@@ -1,6 +1,6 @@
 import React from "react";
 import IconImage from "../IconImage/IconImage";
-import {} from "react-router-dom"
+import { Link } from "react-router-dom"
 
 const SidebarElement = ({data}) => {
     return (<Link to={data.link}>

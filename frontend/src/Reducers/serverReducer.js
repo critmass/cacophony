@@ -1,6 +1,7 @@
 import {
     ADD_SERVER,
     CLEAR_SERVERS,
+    GET_SERVERS,
     REMOVE_SERVER,
     UPDATE_SERVER
 } from "../Actions/actionList"
@@ -24,7 +25,7 @@ const servers = (state=INITIAL_STATE, action) => {
             return newState
         case REMOVE_SERVER:
             return state.filter(server => {
-                server.id !== action.serverId
+                return server.id !== action.serverId
             })
         default:
             return state
