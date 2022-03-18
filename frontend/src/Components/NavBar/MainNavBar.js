@@ -2,33 +2,32 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "reactstrap";
-import useLogout from "../../hooks/useLogout";
 
 const MainNavBar = () => {
     const token = useSelector(state => state.token)
-    const logout = useLogout()
     if(token) {
-        return (<div>
+        return (<div className="">
             <Navbar>
                 <Nav>
                     <NavItem>
-                        <NavLink to="/server">
-                            Server List
-                        </NavLink>
-                    </NavItem>
-                    <NavItem>
                         <NavLink to="/server/add">
-                            Add New Server
+                            <span className="MainNavBar-link">
+                                Add New Server
+                            </span>
                         </NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink to="/profile">
-                            Profile
+                            <span className="MainNavBar-link">
+                                Profile
+                            </span>
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink onClick={logout}>
-                            Logout
+                        <NavLink to="/logout">
+                            <span className="MainNavBar-link">
+                                Logout
+                            </span>
                         </NavLink>
                     </NavItem>
                 </Nav>
@@ -36,17 +35,21 @@ const MainNavBar = () => {
         </div>)
     }
     else {
-        return (<div>
+        return (<div className="">
             <Navbar>
                 <Nav>
                     <NavItem>
                         <NavLink to="/signup">
-                            Sign Up
+                            <span className="MainNavBar-link">
+                                Sign Up
+                            </span>
                         </NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink to="/login">
-                            Log In
+                            <span className="MainNavBar-link">
+                                Log In
+                            </span>
                         </NavLink>
                     </NavItem>
                 </Nav>

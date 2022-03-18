@@ -1,0 +1,22 @@
+nav {
+  background-color: #303030;
+
+}
+
+.MainNavBar-link {
+  width: 100px;
+  text-align: center;
+  color: #f0f2f5;
+  text-decoration: none;
+}
+
+.MainNavBar-link.active {
+  color: #f0f2f5;
+  font-weight: bold;
+  border-bottom: 5px dotted;
+  box-sizing: border-box;
+}
+
+.MainNavBar-link.active:hover {
+  color: #f0f2f5 !important;
+}

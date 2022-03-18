@@ -119,7 +119,7 @@ class Room {
                 }
                 else {
                     postMap.set(row.post_id, {
-                        contents:row.contents,
+                        content:row.content,
                         poster_id:row.poster_id,
                         post_date:row.post_date,
                         threaded_from:row.threaded_from,

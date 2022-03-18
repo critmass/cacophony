@@ -188,9 +188,9 @@ const commonBeforeAll = async () => {
         pictureUrl:defaultImgURL
     })
 
-    await Post.create(1, 1, "post 1") //ID:1
-    await Post.create(2, 1, "post 2") //ID:2
-    await Post.create(3, 1, "post 3") //ID:3
+    await Post.create({memberId:1, roomId:1, content:"post 1"}) //ID:1
+    await Post.create({memberId:2, roomId:1, content:"post 2"}) //ID:2
+    await Post.create({memberId:3, roomId:1, content:"post 3"}) //ID:3
 
 }
 

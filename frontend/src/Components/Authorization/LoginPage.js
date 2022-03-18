@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { Button } from "reactstrap";
-import { getToken } from "../../Actions/tokenActionMaker";
+import { loginUser } from "../../Actions/userActionMaker";
 import useChangeHandler from "../../hooks/useChangeHandler";
 import InputGroupBundle from "../InputGroupBundle/InputGroupBundle";
 
@@ -14,7 +14,8 @@ const LoginPage = () => {
     })
     const handleChange = useChangeHandler(setInputs)
     const handleSubmit = () => {
-        dispatch(getToken(inputs.username, inputs.password))
+        const {username, password} = inputs
+        dispatch(loginUser(username, password))
         history.push("/")
     }
     return (<div>

@@ -155,7 +155,7 @@ class Membership {
      * return [{
      *              id,
      *              nickname,
-     *              server_id,
+     *              server:{id, name, picture_url},
      *              role:{id, title, color:{r, b, g}, is_admin},
      *              picture_url
      *      }, ...]
@@ -168,6 +168,8 @@ class Membership {
                     m.id AS "id",
                     m.nickname AS "nickname",
                     m.server_id AS "server_id",
+                    s.name AS "server_name",
+                    s.picture_url AS "server_picture_url",
                     r.is_admin AS "is_admin",
                     r.id AS "role_id",
                     r.title AS "title",
@@ -175,6 +177,7 @@ class Membership {
                     m.picture_url AS "picture_url"
                 FROM memberships m
                 INNER JOIN roles r ON m.role_id = r.id
+                INNER JOIN servers s ON s.id = m.server_id
                 WHERE m.user_id = $1
         `, [userId])
 
@@ -185,7 +188,11 @@ class Membership {
             return {
                 id: row.id,
                 nickname: row.nickname,
-                server_id:row.server_id,
+                server:{
+                    id:row.server_id,
+                    name:row.server_name,
+                    picture_url:row.server_picture_url
+                },
                 picture_url: row.picture_url,
                 role: {
                     id: row.role_id,

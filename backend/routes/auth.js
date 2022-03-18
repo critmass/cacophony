@@ -35,6 +35,28 @@ router.post("/token", async (req, res, next) => {
         const token = createToken(user);
         await User.updateLastOn(user.id)
 
+        return res.status(200).json({ token, user_id:user.id });
+
+    } catch(err) {
+        return next(err)
+    }
+})
+/** GET /auth/update: => { token }
+ *
+ * Returns JWT token which can be used to authenticate further requests.
+ *
+ * Authorization required: user
+ */
+
+router.get("/update", async (req, res, next) => {
+    try {
+        const userId = res.locals.user.id
+
+        const user = await User.get(userId);
+
+        const token = createToken(user);
+        await User.updateLastOn(user.id)
+
         return res.status(200).json({ token });
 
     } catch(err) {
@@ -42,7 +64,7 @@ router.post("/token", async (req, res, next) => {
     }
 })
 
-/** POST /auth/register:   { user } => { token }
+/** POST /auth/register:   { user } => { token, user_id }
  *
  * user must include { username, password }
  *
@@ -53,6 +75,7 @@ router.post("/token", async (req, res, next) => {
 
 router.post("/register", async function (req, res, next) {
     try {
+        console.info(req.body)
         const validator = jsonschema.validate(
                                         req.body,
                                         userRegisterSchema );
@@ -64,7 +87,7 @@ router.post("/register", async function (req, res, next) {
         const newUser = await User.create(req.body);
         const token = createToken(newUser);
 
-        return res.status(201).json({ token });
+        return res.status(201).json({ token, user_id:newUser.id });
     } catch (err) {
         return next(err);
     }

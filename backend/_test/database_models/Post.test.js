@@ -49,28 +49,32 @@ describe("Get Post", () => {
 
 describe("Create Post", () => {
     it("creates a new post", async () => {
-        const newPost = await Post.create(1, 1, "new post")
+        const newPost = await Post.create(
+            { memberId:1, roomId:1, content:"new post"})
         expect(newPost.room_id).toBe(1)
         expect(newPost.content).toBe("new post")
         expect(newPost.member_id).toBe(1)
     })
     it("throws an error if member id not found", async () => {
         try {
-            await Post.create(5000, 1, "bad post")
+            await Post.create(
+                {memberId:5000, roomId:1, content:"bad post"})
         } catch (err) {
             expect(err instanceof Error).toBeTruthy()
         }
     })
     it("throws an error if room id not found", async () => {
         try {
-            await Post.create(1, 5000, "bad post")
+            await Post.create(
+                {memberId:1, roomId:5000, content:"bad post"})
         } catch (err) {
             expect(err instanceof Error).toBeTruthy()
         }
     })
     it("throws an error if post content empty", async () => {
         try {
-            await Post.create(1, 1, "")
+            await Post.create(
+                {memberId:1, roomId:1, content:""})
         } catch (err) {
             expect(err instanceof Error).toBeTruthy()
         }

@@ -137,6 +137,18 @@ describe("Find Memberships", () => {
             expect(err instanceof Error).toBeTruthy()
         }
     })
+    it("finds memberships by server id and user id", async () => {
+        const members = await Membership.find({serverId:1, userId:2})
+        expect(members.length).toBe(1)
+    })
+    it("Throws an error if membership doesn't exist", async () => {
+        try {
+            await Membership.find({serverId:7, userId:1})
+
+        } catch (err) {
+            expect(err instanceof Error).toBeTruthy()
+        }
+    })
 })
 
 describe("Create Memberships", () => {

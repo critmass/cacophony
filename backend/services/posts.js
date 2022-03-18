@@ -15,13 +15,16 @@ const Membership = require("../database_models/Membership");
 
 const createPost = async (req, res, next) => {
     try {
+        console.log(req.body)
         const validator = jsonschema.validate(req.body, newPostSchema)
         if (!validator.valid) throw new BadRequestError(validator.errors)
 
         const {roomId, serverId} = req.params
         const userId = res.locals.user.id
-        const membership = await Membership.find({userId, serverId})
-        const memberId = membership.id
+        const members = await Membership.find({userId, serverId})
+        const memberId = members[0].id
+
+        console.log(`${memberId}:${roomId}-${req.body.content}`)
 
         const post = await Post.create({...req.body, roomId, memberId})
 
@@ -55,7 +58,8 @@ const getPost = async (req, res, next) => {
     }
 }
 
-/** PATCH /[postId] => {id, member_id, room_id, server_id, content}   */
+/** PATCH /[postId] {}
+ *              => {id, member_id, room_id, server_id, content}   */
 
 // not implimented
 const updatePost = async (req, res, next) => {
@@ -65,6 +69,8 @@ const updatePost = async (req, res, next) => {
         next(error)
     }
 }
+
+/** PUT /[postId]  */
 
 
 /** DELETE /[postId] => {id, member_id, room_id, server_id, content}  */

@@ -1,7 +1,10 @@
 import CacophonyApi from "../helpers/CacophonyAPI"
 import { CLEAR_TOKEN, GET_TOKEN } from "./actionList"
+import { loginUser } from "./userActionMaker"
 
 const gotToken = token => {
+    localStorage.setItem("jwToken", token)
+    console.log(localStorage)
     return {type:GET_TOKEN, token}
 }
 
@@ -22,8 +25,31 @@ const getTokenFromRegistration = (username, password, picture_url) => {
     return getTokenFromApi
 }
 
+const getTokenFromLocalStorage = () => {
+    const token = localStorage.getItem("jwToken")
+    CacophonyApi.token = token
+    return gotToken(token)
+}
+
+const getUpdatedToken = () => {
+    const getUpdatedTokenFromApi = async dispatch => {
+        const token = await CacophonyApi.updateToken()
+        dispatch(gotToken(token))
+    }
+    return getUpdatedTokenFromApi
+}
+
 const clearToken = () => {
+    CacophonyApi.token = null
+    localStorage.setItem("jwToken", "")
     return {type:CLEAR_TOKEN}
 }
 
-export {getToken, clearToken, getTokenFromRegistration}
+export {
+    getToken,
+    clearToken,
+    getTokenFromRegistration,
+    gotToken,
+    getTokenFromLocalStorage,
+    getUpdatedToken
+}

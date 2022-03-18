@@ -8,12 +8,7 @@ const {
     commonBeforeEach,
     commonAfterEach,
     commonAfterAll,
-    defaultColor1,
-    defaultColor2,
-    user1Token,
     user2Token,
-    user4Token,
-    user5Token
 } = require("../routes/_testCommon");
 
 beforeAll(commonBeforeAll)
@@ -22,11 +17,17 @@ afterEach(commonAfterEach)
 afterAll(commonAfterAll)
 
 describe("POST servers/:serverId/rooms/:roomId/posts", () => {
-    const newPost = {}
+    const newPost = {content:"new post"}
     it("should create a post and return it", async () => {
-        const resp = await request(app).post(`servers/1/rooms/1/posts`)
+        const resp = await request(app)
+            .post("/servers/1/rooms/1/posts")
+            .send(newPost)
+            .set(
+                "authorization",
+                `Bearer ${user2Token}`
+            )
         expect(resp.status).toBe(201)
-
+        expect(resp.body.post.content).toBe(newPost.content)
     })
 
 })

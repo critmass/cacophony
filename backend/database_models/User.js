@@ -19,9 +19,13 @@ class User {
      *              username,
      *              is_site_admin,
      *              memberships:[{
-     *                  role_id,
+     *                  role:{id, title},
      *                  is_server_admin,
-     *                  server_id
+     *                  server:{
+     *                      id,
+     *                      name,
+     *                      picture_url
+     *                  }
      *              }, ...]
      *          }
      */
@@ -63,7 +67,7 @@ class User {
                                 result.rows.map( row => {
                                     return {
                                         id:row.member_id,
-                                        serverId:row.server_id,
+                                        server_id:row.server_id,
                                         role_id:row.role_id,
                                         is_admin:row.is_server_admin
                                     }
@@ -114,7 +118,7 @@ class User {
                     is_site_admin
         `, [username, hashedPassword, pictureUrl, now, isSiteAdmin])
 
-        return result.rows[0]
+        return {...result.rows[0], memberships:[]}
     }
 
     /** finds with username
@@ -229,32 +233,36 @@ class User {
 
         const basicInfo = result.rows[0]
 
-        return {
+        const user = {
             id:basicInfo.id,
             username:basicInfo.username,
             picture_url:basicInfo.picture_url,
             joining_date:basicInfo.joining_date,
             last_on:basicInfo.last_on,
             is_site_admin:basicInfo.is_site_admin,
-            memberships:result.rows.map( row => {
-                return {
-                    id:row.member_id,
-                    nickname:row.nickname,
-                    joining_date:row.joining_date,
-                    server:{
-                        id:row.server_id,
-                        name:row.name,
-                        picture_url:row.picture_url
-                    },
-                    role:{
-                        id:row.role_id,
-                        title:row.role_title,
-                        color:intToColor(row.role_color),
-                        is_admin:row.is_server_admin
+            memberships:result.rows[0].member_id ?
+                result.rows.map( row => {
+                    return {
+                        id:row.member_id,
+                        nickname:row.nickname,
+                        joining_date:row.joining_date,
+                        server:{
+                            id:row.server_id,
+                            name:row.server_name,
+                            picture_url:row.server_picture_url
+                        },
+                        role:{
+                            id:row.role_id,
+                            title:row.role_title,
+                            color:intToColor(row.role_color),
+                            is_admin:row.is_server_admin
+                        }
                     }
-                }
-            })
+
+                }):
+                []
         }
+        return user
     }
 
     /** Updates the last_on of a user to current time with the given id

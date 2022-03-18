@@ -2,34 +2,28 @@
 
 /** Express app for Cacophony */
 
-const express = require("express")
-const cors = require("cors")
+const express = require("express");
+const cors = require("cors");
 const morgan = require("morgan");
 
-const { NotFoundError } = require("./expressError")
+const { NotFoundError } = require("./expressError");
 
-const authRoutes = require("./routes/auth")
-const usersRoutes = require("./routes/users")
+const authRoutes = require("./routes/auth");
+const usersRoutes = require("./routes/users");
 const serversRoutes = require("./routes/servers");
 const { authenticateJWT } = require("./middleware/auth");
-const { updateLastOn } = require("./database_models/User");
+const updateLastOn = require("./helpers/updateLastOn");
 
-const app = express()
+const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
-app.use(authenticateJWT)
-app.use(async (req, res, next) => {
-    try {
-        if(res.locals.user) await updateLastOn(res.locals.user.id)
-        return next()
-    } catch (err) {
-        next(err)
-    }
-})
 
 app.use("/auth", authRoutes)
+app.use(authenticateJWT)
+app.use(updateLastOn)
+
 app.use("/users", usersRoutes)
 app.use("/servers", serversRoutes)
 

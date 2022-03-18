@@ -40,7 +40,7 @@ class Post {
      *
      * returns [{
      *              id,
-     *              member_id,
+     *              poster:{id, name, picture_url},
      *              content,
      *              post_date,
      *              reactions:{ [type]:[member_id, ...], ...}
@@ -57,9 +57,12 @@ class Post {
                     p.post_date AS "post_date",
                     p.threaded_from AS "threaded_from",
                     r.type AS "react_type",
-                    r.member_id AS "react_member_id"
+                    r.member_id AS "react_member_id",
+                    m.nickname AS "poster_name",
+                    m.picture_url AS "poster_picture_url"
                 FROM posts p
                 LEFT JOIN reactions r ON p.id = r.post_id
+                LEFT JOIN memberships m ON m.id = p.member_id
                 WHERE p.room_id = $1
         `,[roomId])
 
@@ -81,7 +84,11 @@ class Post {
             else {
                 postMap.set(row.id, {
                     id:row.id,
-                    member_id:row.member_id,
+                    poster:{
+                        id:row.member_id,
+                        name: row.poster_name,
+                        picture_url: row.poster_picture_url
+                    },
                     content:row.content,
                     post_date:row.post_date,
                     reactions:row.react_type ?

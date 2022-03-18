@@ -17,11 +17,19 @@ class CacophonyApi {
         const params = (method === "get") ? data : {};
 
         try {
-            const {data} = await axios({ url, method, data, params, headers })
-            return data
+            const resp = await axios({
+                url,
+                method,
+                data,
+                params,
+                headers
+            })
+            return resp.data
         }
         catch (err) {
+
             console.error("API Error:", err.response);
+
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
         }
@@ -34,12 +42,13 @@ class CacophonyApi {
 
     static async getServer(serverId) {
         const data = await this.request(`servers/${serverId}`)
+        console.log(data)
         return data.server
     }
 
     static async addServer(server) {
         const data = await this.request("servers", server, "post")
-        return data
+        return data.server
     }
 
     static async updateServer(serverId, updates) {
@@ -51,8 +60,13 @@ class CacophonyApi {
 
     static async removeServer(serverId) {
         const data = await this.request(`servers/${serverId}`, {}, "delete")
-        if(data.server) return true
+        if(data.server.name) return true
         else return false
+    }
+
+    static async getUsers() {
+        const data = await this.request(`users`)
+        return data.users
     }
 
     static async getUser(userId) {
@@ -62,15 +76,17 @@ class CacophonyApi {
 
     static async updateUser(userId, updates) {
         const data = await this.request(
-            `users/${userId}`, updates, "post")
+            `users/${userId}`, updates, "patch")
         return data.user
     }
 
     static async getRoles(serverId) {
         const data = await this.request(`servers/${serverId}/roles`)
-        const roles = data.roles.reduce( (roleMap, role) => {
-            roleMap.set(role.id, role)
-        }, new Map())
+
+        const roles = new Map()
+        data.roles.forEach( role => {
+            roles.set(role.id, role)
+        })
         return roles
     }
 
@@ -89,7 +105,7 @@ class CacophonyApi {
     static async removeRole(serverId, roleId) {
         const data = await this.request(
             `servers/${serverId}/roles/${roleId}`, {}, 'delete')
-
+        return data.role
     }
 
     static async updateMembership(memberId, serverId, updates) {
@@ -117,29 +133,42 @@ class CacophonyApi {
         return data.membership
     }
 
-    static async removerMembership({member_id, server_id}) {
+    static async removerMembership(member_id, server_id) {
 
         const data = await this.request(
-            `servers/${server_id}/memberships/${member_id}`, {}, "delete")
+            `servers/${server_id}/members/${member_id}`, {}, "delete")
         if(data.membership) return true
         else return false
     }
 
-    static async getMembership({member_id, server_id}) {
+    static async getMembership(member_id, server_id) {
 
         const data = await this.request(
-            `servers/${server_id}/memberships/${member_id}`, {}, "get")
+            `servers/${server_id}/members/${member_id}`, {}, "get")
         return data.membership
     }
 
     static async getRoom(serverId, roomId) {
         const data = await this.request(
             `servers/${serverId}/rooms/${roomId}`, {}, 'get')
+        return data.room
+    }
+
+    static async addRoom(serverId, roomData) {
+        await this.request(`servers/${serverId}/rooms`, roomData, "post")
+    }
+
+    static async removeRoom(serverId, roomId) {
+        await this.request(
+            `servers/${serverId}/rooms/${roomId}`,
+            {},
+            "delete"
+        )
     }
 
     static async postToRoom(serverId, roomId, post) {
         await this.request(
-            `servers/${serverId}/rooms/${roomId}/post`, {post}, "post")
+            `servers/${serverId}/rooms/${roomId}/posts`, post, "post")
 
     }
 
@@ -147,14 +176,21 @@ class CacophonyApi {
         const response = await this.request(
             `auth/token`, {username, password}, 'post')
         this.token = response.token
+        return {token:this.token, user_id:response.user_id}
+    }
+
+    static async updateToken() {
+        const resp = await this.request(`auth/update`,{}, "get")
+        this.token = resp.token
         return this.token
     }
 
     static async register(username, password, picture_url) {
         const resp = await this.request(
             `auth/register`, {username, password, picture_url}, "post")
+        console.log(resp)
         this.token = resp.token
-        return this.token
+        return {token:this.token, user_id:resp.user_id}
     }
 }
 

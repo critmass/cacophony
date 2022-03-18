@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { Button } from "reactstrap";
-import { getTokenFromRegistration } from "../../Actions/tokenActionMaker";
+import { registerUser } from "../../Actions/userActionMaker";
 import useChangeHandler from "../../hooks/useChangeHandler";
 import InputGroupBundle from "../InputGroupBundle/InputGroupBundle";
 
@@ -17,7 +17,7 @@ const RegistrationPage = () => {
     const handleChange = useChangeHandler(setInputs)
     const handleSubmit = () => {
         const {username, password, pictureUrl} = inputs
-        dispatch(getTokenFromRegistration(username, password, pictureUrl))
+        dispatch(registerUser(username, password, pictureUrl))
         history.push("/")
     }
     return (<div>

@@ -1,15 +1,12 @@
-import React, { useContext } from "react";
-import ServerPageContext from "../../Context/ServerPageContext";
+import React from "react";
+import { useSelector } from "react-redux";
 import Sidebar from "./Sidebar";
 
 const RoomSidebar = () => {
-    const {rooms} = useContext(ServerPageContext)
+    const server = useSelector(state => state.server)
 
     return (
-        <Sidebar
-            data={rooms}
-            className={"RoomSidebar"}
-        />
+        <Sidebar data={server.rooms} className={"RoomSidebar"} />
     )
 }
 

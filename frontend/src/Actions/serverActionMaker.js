@@ -1,61 +1,66 @@
 import CacophonyApi from "../helpers/CacophonyAPI"
 import {
     ADD_SERVER,
-    CLEAR_SERVERS,
-    GET_SERVERS,
-    REMOVE_SERVER
+    CLEAR_SERVER,
+    UPDATE_MEMBERS,
+    UPDATE_ROLES,
+    UPDATE_ROOMS,
+    GET_SERVER,
+    UPDATE_SERVER
 } from "./actionList"
-import { addedMembership } from "./membershipActionMaker"
 import { getUser } from "./userActionMaker"
 
-const gotServers = servers => {
-    return {type:GET_SERVERS, servers}
+const gotServer = (server) => {
+    return {type:GET_SERVER, server}
 }
 
-const getServers = () => {
-    const getServersFromApi = async dispatch => {
-        const servers = await CacophonyApi.getServers()
-        dispatch(gotServers(servers))
+const getServer = (serverId) => {
+    const getServerFromApi = async dispatch => {
+        const serverInfo = await CacophonyApi.getServer(serverId)
+        dispatch(gotServer(serverInfo))
     }
-    return getServersFromApi
+    return getServerFromApi
 }
 
-const clearServers = () => {
-    return {type:CLEAR_SERVERS}
+const updatedServer = (updates) => {
+    return {type:UPDATE_SERVER, updates}
 }
 
-const addedServer = server => {
+const updateServer = (serverId, updates) => {
+    const updateServerByApi = async dispatch => {
+        const serverInfo = await CacophonyApi.updateServer(serverId, updates)
+        dispatch(updatedServer(serverInfo))
+    }
+    return updateServerByApi
+}
+
+const addedServer = (server) => {
     return {type:ADD_SERVER, server}
 }
 
-const addServer = (serverName, pictureUrl = null) => {
+const addServer = (serverData) => {
     const addServerToApi = async dispatch => {
-        const {membership, server} = await CacophonyApi.addServer(
-                                                    {serverName, pictureUrl})
-        dispatch(addedServer(server))
-        dispatch(addedMembership(membership))
+        const {server, membership} = await CacophonyApi.addServer(serverData)
+        const userId = membership.user_id
+        dispatch(getUser(userId))
     }
     return addServerToApi
 }
 
-const removedServer = serverId => {
-    return {type:REMOVE_SERVER, serverId}
+const updatedMembers = (members) => {
+    return {UPDATE_MEMBERS, members}
 }
 
-const removeServer = (serverId) => {
-    const removeServerFromApi = async dispatch => {
-        const success = await CacophonyApi.removeServer(serverId)
-        if(success) {
-            dispatch(removedServer(serverId))
-            dispatch(getUser())
-        }
-    }
-    return removeServerFromApi
+const updatedRoles = (roles) => {
+    return {UPDATE_ROLES, roles}
 }
 
-export {
-    getServers,
-    clearServers,
-    addServer,
-    removeServer
+const updatedRooms = (rooms) => {
+    return {UPDATE_ROOMS, rooms}
 }
+
+const clearServer = () => {
+    return {type:CLEAR_SERVER}
+}
+
+export {getServer, updateServer, clearServer, addServer}

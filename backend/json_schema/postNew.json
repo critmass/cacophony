@@ -1,17 +1,9 @@
 {
     "type":"object",
     "required":[
-        "user_id",
-        "room_id",
         "content"
     ],
     "properties":{
-        "user_id":{
-            "type":"integer"
-        },
-        "room_id":{
-            "type":"integer"
-        },
         "content":{
             "type":"string",
             "minLength":1,

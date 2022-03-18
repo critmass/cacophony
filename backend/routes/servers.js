@@ -57,6 +57,7 @@ const {
     doesServerExist,
     isMembershipOnServer
 } = require("../middleware/structure");
+const { intToColor } = require("../helpers/colorConverter");
 
 
 /** POST / {
@@ -81,6 +82,20 @@ const {
  *                         name,
  *                         picture_url,
  *                         start_date,
+ *                         members:[
+ *                              id,
+ *                              user_id,
+ *                              nickname,
+ *                              joining_date,
+ *                              role:{
+ *                                 id,
+ *                                 is_admin,
+ *                                 title,
+ *                                 color
+ *                              },
+ *                              server_id,
+ *                              picture_url
+ *                         ]
  *                         roles:[{id, title, color, is_admin}, ...]
  *                         rooms:[{id, name, type}]
  *                  }
@@ -109,9 +124,9 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
                                 {name:"Main Room", serverId:server.id})
         await Role.addAccess(adminRole.id, room.id, true)
         const data = {
-                membership,
                 server: {
                     ...server,
+                    members:[membership],
                     roles: [adminRole, memberRole],
                     rooms: [room]
                 }
@@ -160,6 +175,7 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
  *                              picture_url,
  *                              joining_date
  *                          }, ...],
+ *                         roles:[{id, title, color:{r,b,g}}],
  *                         rooms:[{id, name, type}, ...]
  *                     }}
  * */
@@ -171,7 +187,12 @@ router.get("/:serverId",
         try {
             const serverInfo = await Server.get(req.params.serverId)
             const roleMap = serverInfo.roles.reduce( (map, role) => {
-                map.set(role.id, role)
+                map.set(
+                    role.id, {
+                        ...role,
+                        color:intToColor(role.color)
+                    }
+                )
                 return map
             }, new Map())
             const server = {
@@ -187,6 +208,7 @@ router.get("/:serverId",
                         joining_date:member.joining_date
                     }
                 }),
+                roles:[...roleMap.values()],
                 rooms:serverInfo.rooms
             }
 
@@ -244,6 +266,19 @@ router.delete("/:serverId",
         }
 })
 
+// posts routes
+router.post("/:serverId/rooms/:roomId/posts",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, createPost)
+router.get("/:serverId/rooms/:roomId/posts",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, getPosts)
+router.get("/:serverId/rooms/:roomId/posts/:postId",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, getPost)
+router.patch("/:serverId/rooms/:roomId/posts/:postId",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, updatePost)
+router.delete("/:serverId/rooms/:roomId/posts/:postId",
+    doesServerExist, isRoomOnServer, ensureIsServerMember, removePost)
+
+
 // rooms routes
 router.post("/:serverId/rooms",
     doesServerExist, ensureIsServerAdmin, createRoom)
@@ -255,19 +290,6 @@ router.patch("/:serverId/rooms/:roomId",
     doesServerExist, isRoomOnServer, ensureIsServerAdmin, patchRoom)
 router.delete("/:serverId/rooms/:roomId",
     doesServerExist, isRoomOnServer, ensureIsServerAdmin, deleteRoom)
-
-// post routes
-router.post("/:serverId/rooms/:roomId/posts",
-    doesServerExist, isRoomOnServer, ensureIsServerMember, createPost)
-router.get("/:serverId/rooms/:roomId/posts",
-    doesServerExist, isRoomOnServer, ensureIsServerMember, getPosts)
-router.get("/:serverId/rooms/:roomId/posts/:postId",
-    doesServerExist, isRoomOnServer, ensureIsServerMember, getPosts)
-router.patch("/:serverId/rooms/:roomId/posts/:postId",
-    doesServerExist, isRoomOnServer, ensureIsServerMember, updatePost)
-router.delete("/:serverId/rooms/:roomId/posts/:postId",
-    doesServerExist, isRoomOnServer, ensureIsServerMember, removePost)
-
 
 // roles routes
 router.post("/:serverId/roles",

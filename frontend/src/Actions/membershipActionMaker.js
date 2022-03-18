@@ -6,6 +6,7 @@ import {
     REMOVE_MEMBERSHIP,
     UPDATE_MEMBERSHIPS
 } from "./actionList"
+import {v4 as uuid} from "uuid"
 
 const gotMemberships = memberships => {
     return {type:GET_MEMBERSHIPS, memberships}
@@ -25,7 +26,9 @@ const updateMembership = (memberId, updates) => {
         const membership = await CacophonyApi.updateMembership(
             memberId, updates
         )
-        dispatch(updatedMembership(membership))
+        dispatch(updatedMembership(
+            { ...membership, server: { ...membership.server, key: uuid() } }
+        ))
     }
     return updateMembershipByApi
 }
@@ -50,7 +53,9 @@ const addMembership = (
             nickname,
             pictureUrl
         )
-        dispatch(addedMembership(membership))
+        dispatch(addedMembership(
+            {...membership, server:{...membership.server, key:uuid()}}
+        ))
     }
     return addMembershipToApi
 }

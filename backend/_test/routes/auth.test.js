@@ -28,6 +28,7 @@ describe("POST /auth/token", () => {
                 });
             expect(resp.body).toEqual({
                 "token": expect.any(String),
+                "user_id": expect.any(Number)
             });
     })
     it(`throws a 401 error when invalid user id`, async () => {
@@ -69,6 +70,7 @@ describe("POST /auth/register", () => {
         expect(resp.statusCode).toEqual(201);
         expect(resp.body).toEqual({
             "token": expect.any(String),
+            "user_id": expect.any(Number)
         });
     })
     it("throws a 400 error when invalid data provided", async () => {

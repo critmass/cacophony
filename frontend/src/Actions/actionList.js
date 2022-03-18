@@ -17,8 +17,10 @@ export const ADD_MEMBERSHIP = "ADD_MEMBERSHIP"
 export const REMOVE_MEMBERSHIP = "REMOVE_MEMBERSHIP"
 
 // server actions
-export const GET_SERVERS = "GET_SERVERS"
-export const CLEAR_SERVERS = "CLEAR_SERVERS"
+export const GET_SERVER = "GET_SERVER"
 export const ADD_SERVER = "ADD_SERVER"
-export const REMOVE_SERVER = "REMOVE_SERVER"
+export const UPDATE_ROOMS = "UPDATE_ROOM"
+export const UPDATE_ROLES = "UPDATE_ROLES"
 export const UPDATE_SERVER = "UPDATE_SERVER"
+export const UPDATE_MEMBERS = "UPDATE_MEMBERS"
+export const CLEAR_SERVER = "CLEAR_SERVER"
