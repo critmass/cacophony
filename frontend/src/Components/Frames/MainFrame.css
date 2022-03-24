@@ -1,5 +1,18 @@
 .MainFrame-Sidebar {
-    background-color: lightskyblue;
+    background-color: #303030;
     height: 100%;
 }
 
+.MainFrame-container {
+    height: 92vh;
+    width: 100vw;
+    margin-right: 0%;
+}
+
+.MainFrame-row {
+    height: 92vh;
+}
+
+.MainFrame-main-page {
+    background-color: darkgrey;
+}

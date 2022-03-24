@@ -1,4 +1,4 @@
-const useChangeHandler = setValues => {
+const useChangeHandler = (setValues, submit=null) => {
 
     const handleChange = e => {
         const { value, name } = e.target

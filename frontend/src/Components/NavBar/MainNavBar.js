@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "reactstrap";
+import "./MainNavBar.css"
 
 const MainNavBar = () => {
     const token = useSelector(state => state.token)
@@ -10,24 +11,27 @@ const MainNavBar = () => {
             <Navbar>
                 <Nav>
                     <NavItem>
-                        <NavLink to="/server/add">
-                            <span className="MainNavBar-link">
-                                Add New Server
-                            </span>
+                        <NavLink
+                            to="/server/add"
+                            className="MainNavBar-link"
+                        >
+                            Add New Server
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink to="/profile">
-                            <span className="MainNavBar-link">
-                                Profile
-                            </span>
+                        <NavLink
+                            to="/profile"
+                            className="MainNavBar-link"
+                        >
+                            Profile
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink to="/logout">
-                            <span className="MainNavBar-link">
-                                Logout
-                            </span>
+                        <NavLink
+                            to="/logout"
+                            className="MainNavBar-link"
+                        >
+                            Logout
                         </NavLink>
                     </NavItem>
                 </Nav>

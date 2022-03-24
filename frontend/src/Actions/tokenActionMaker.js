@@ -1,6 +1,5 @@
 import CacophonyApi from "../helpers/CacophonyAPI"
 import { CLEAR_TOKEN, GET_TOKEN } from "./actionList"
-import { loginUser } from "./userActionMaker"
 
 const gotToken = token => {
     localStorage.setItem("jwToken", token)

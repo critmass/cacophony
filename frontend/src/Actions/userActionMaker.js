@@ -1,7 +1,7 @@
 import { CLEAR_USER, GET_USER, UPDATE_USER } from "./actionList"
 import CacophonyApi from "../helpers/CacophonyAPI"
 import { gotMemberships } from "./membershipActionMaker"
-import { gotToken } from "./tokenActionMaker"
+import { getUpdatedToken, gotToken } from "./tokenActionMaker"
 import {v4 as uuid} from "uuid"
 import jwt from "jsonwebtoken"
 
@@ -49,11 +49,11 @@ const loginUser = (username, password) => {
 const loginUserByToken = token => {
     const loginUserByTokenFromApi = async dispatch => {
         const {id} = jwt.decode(token)
-        console.log(id)
         const user = await CacophonyApi.getUser(id)
         const userData = extractUserInfo(user)
         dispatch(gotUser(userData))
         dispatch(gotMemberships(user.memberships))
+        dispatch(getUpdatedToken())
     }
     return loginUserByTokenFromApi
 }
@@ -83,6 +83,7 @@ const updateUser = (updates, userId) => {
         const {user} = await CacophonyApi.updateUser(userId, updates)
         const userData = extractUserInfo(user)
         dispatch(updatedUser(userData))
+        dispatch(getUpdatedToken())
     }
     return updateUserWithApi
 }

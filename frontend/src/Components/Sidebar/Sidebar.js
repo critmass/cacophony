@@ -8,7 +8,7 @@ const Sidebar = ({data, className, defaultImg=null}) => {
         return (<div className={className}>
             <ul className={`Sidebar`}>
                 {data.map( line => {
-                    return (<li key={line.key}>
+                    return (<li key={line.key} className={"Sidebar-li"}>
                         <SidebarElement
                             data={{
                                 ...line,

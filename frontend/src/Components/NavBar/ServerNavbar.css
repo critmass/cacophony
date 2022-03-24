@@ -1,0 +1,13 @@
+.ServerNavBar-navbar {
+    background-color: #333333;
+    height: 5vh;
+}
+
+.ServerNavBar-Link {
+    color: whitesmoke;
+    text-decoration: none;
+}
+
+.ServerNavBar-Link:hover {
+    color: #ababab;
+}

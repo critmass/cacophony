@@ -2,6 +2,7 @@ import React from "react";
 import ServerNavBar from "../NavBar/ServerNavbar";
 import MembersSidebar from "../Sidebar/MembersSidebar";
 import RoomSidebar from "../Sidebar/RoomSidebar";
+import "./ServerFrame.css"
 
 const ServerFrame = ({children}) => {
     return (<>

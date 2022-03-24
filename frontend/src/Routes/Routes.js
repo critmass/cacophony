@@ -4,7 +4,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import { useSelector } from "react-redux"
 import Home from "../Components/Home/Home";
 import Logout from "../helpers/Logout";
-import FrontPage from "../Components/FrontPage/FrontPage";
+import FrontPage from "../Components/Home/FrontPage";
 import LoginPage from "../Components/Authorization/LoginPage";
 import ServerList from "../Components/ServerList/ServerList";
 import ServerPage from "../Components/ServerPage/ServerPage";

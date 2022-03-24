@@ -1,10 +1,13 @@
 nav {
   background-color: #303030;
-
+  text-align: right;
+  justify-content: right;
+  height: 8vh;
 }
 
 .MainNavBar-link {
   width: 100px;
+  margin-left: 10mm;
   text-align: center;
   color: #f0f2f5;
   text-decoration: none;
@@ -17,6 +20,7 @@ nav {
   box-sizing: border-box;
 }
 
-.MainNavBar-link.active:hover {
-  color: #f0f2f5 !important;
+.MainNavBar-link:hover {
+  color: #a5a5a5 !important;
 }
+

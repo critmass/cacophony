@@ -1,6 +1,7 @@
 import React from "react";
 import Sidebar from "./Sidebar";
 import { useSelector } from "react-redux"
+import "./Sidebar.css"
 
 const MainSidebar = () => {
     const memberships = useSelector(state => state.memberships)

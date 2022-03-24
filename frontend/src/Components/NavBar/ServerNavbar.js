@@ -2,12 +2,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router";
+import "./ServerNavbar.css"
 
 const ServerNavBar = () => {
     const {serverId} = useParams()
     const memberships = useSelector(state => state.memberships)
     const membership = memberships.find(m => {
-        console.log(m)
         return Number(m.server.id) === Number(serverId)
     })
     return (<div className="row ServerNavBar-navbar">

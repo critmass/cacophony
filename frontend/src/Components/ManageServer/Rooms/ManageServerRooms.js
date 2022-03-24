@@ -7,6 +7,7 @@ import CacophonyApi from "../../../helpers/CacophonyAPI";
 import useChangeHandler from "../../../hooks/useChangeHandler";
 import InputGroupBundle from "../../InputGroupBundle/InputGroupBundle";
 // import LoadingScreen from "../../LoadingScreen/LoadingScreen";
+import "./ManagerServerRooms.css"
 
 const ManagerServerRooms = () => {
     const {serverId} = useParams()

@@ -6,19 +6,20 @@ import ChatLine from "./ChatLine";
 import ChatSubmissionLine from "./ChatSubmissionLine";
 import {v4 as uuid} from "uuid"
 import { useSelector } from "react-redux";
+import "./RoomScreen.css"
 
 const RoomScreen = () => {
     const {serverId, roomId} = useParams()
     const [lines, setLines] = useState([])
     const [isLoading, setIsLoading] = useState(true)
-    const {server, user} = useSelector(state => state)
+    const {server} = useSelector(state => state)
     const members = server.members
 
     useEffect(() => {
         const getContent = async () => {
             const content = await CacophonyApi.getRoom(serverId, roomId)
             const posts = content.posts.sort((a,b) => {
-                return a.id - b.id
+                return b.id - a.id
             })
 
             setLines(posts)
@@ -34,29 +35,19 @@ const RoomScreen = () => {
 
     if(isLoading) return <LoadingScreen/>
 
-    return (<div>
+    return (<div className="RoomScreen">
         <ul>
             {lines && lines.map(line => {
-                return (<li >
-                    {
-                        user.id === line.poster_id ?
-                            <ChatLine
-                                poster = {members.find(member => {
-                                    return member.id === line.poster_id
-                                })}
-                                content = {line.content}
-                                post_date = {line.post_date}
-                                key={uuid()}
-                            />:
-                            <ChatLine
-                                poster = {members.find(member => {
-                                    return member.id === line.poster_id
-                                })}
-                                content = {line.content}
-                                post_date = {line.post_date}
-                                key={uuid()}
-                            />
-                    }
+                return (<li className="">
+
+                    <ChatLine
+                        poster = {members.find(member => {
+                            return member.id === line.poster_id
+                        })}
+                        content = {line.content}                            post_date = {line.post_date}
+                        key={uuid()}
+                    />
+
                 </li>)
             })}
         </ul>

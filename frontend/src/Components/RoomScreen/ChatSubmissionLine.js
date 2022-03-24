@@ -17,7 +17,7 @@ const ChatSubmissionLine = ({reload}) => {
 
     const submitButton = <Button onClick={handleSubmit}>Submit</Button>
 
-    return (
+    return (<div className="mx-3 px-3 ChatSubmissionLine">
         <InputGroupBundle
             name={"content"}
             value={inputs.content}
@@ -25,7 +25,7 @@ const ChatSubmissionLine = ({reload}) => {
             label={submitButton}
             type={"text"}
         />
-    )
+    </div>)
 }
 
 export default ChatSubmissionLine

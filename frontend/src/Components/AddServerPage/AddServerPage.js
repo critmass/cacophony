@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { Button } from "reactstrap";
 import { addServer } from "../../Actions/serverActionMaker";
+import { loginUserByToken } from "../../Actions/userActionMaker";
 import useChangeHandler from "../../hooks/useChangeHandler";
 import InputGroupBundle from "../InputGroupBundle/InputGroupBundle";
 
@@ -13,9 +14,11 @@ const AddServerPage = () => {
     })
     const dispatch = useDispatch()
     const history = useHistory()
+    const token = useSelector(state => state.token)
     const handleChange = useChangeHandler(setInputs)
     const handleSubmit = async () => {
         dispatch(addServer(inputs))
+        dispatch(loginUserByToken(token))
         history.push("/")
     }
     return (<div>

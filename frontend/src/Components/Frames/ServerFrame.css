@@ -1,0 +1,13 @@
+.ServerFrame-row {
+    height: 100%;
+}
+
+.ServerFrame-RoomSidebar {
+    height: 87vh;
+    background-color: #555555;
+}
+
+.ServerFrame-MembersSidebar {
+    height: 87vh;
+    background-color: #555555;
+}

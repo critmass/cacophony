@@ -42,7 +42,6 @@ class CacophonyApi {
 
     static async getServer(serverId) {
         const data = await this.request(`servers/${serverId}`)
-        console.log(data)
         return data.server
     }
 
@@ -111,7 +110,7 @@ class CacophonyApi {
     static async updateMembership(memberId, serverId, updates) {
 
         const data = await this.request(
-            `servers/${serverId}/memberships/${memberId}`,
+            `servers/${serverId}/members/${memberId}`,
             updates,
             'patch'
         )
@@ -123,11 +122,11 @@ class CacophonyApi {
         roleId,
         userId,
         nickname,
-        picture_url
+        pictureUrl
     ) {
         const data = await this.request(
             `servers/${serverId}/members`,
-            {roleId, userId, nickname, picture_url},
+            {roleId, userId, nickname, pictureUrl},
             "post"
         )
         return data.membership
@@ -185,9 +184,9 @@ class CacophonyApi {
         return this.token
     }
 
-    static async register(username, password, picture_url) {
+    static async register(username, password, pictureUrl) {
         const resp = await this.request(
-            `auth/register`, {username, password, picture_url}, "post")
+            `auth/register`, {username, password, pictureUrl}, "post")
         console.log(resp)
         this.token = resp.token
         return {token:this.token, user_id:resp.user_id}
