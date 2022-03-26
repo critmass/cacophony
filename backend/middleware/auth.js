@@ -26,7 +26,6 @@ const authenticateJWT = (req, res, next) => {
     if (authHeader) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
       res.locals.user = jwt.verify(token, SECRET_KEY);
-
     }
     return next();
   } catch (err) {

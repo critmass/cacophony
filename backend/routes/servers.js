@@ -202,6 +202,7 @@ router.get("/:serverId",
                 members:serverInfo.members.map( member => {
                     return {
                         id:member.id,
+                        user_id:member.user_id,
                         nickname:member.nickname,
                         role:roleMap.get(member.role_id),
                         picture_url:member.picture_url,

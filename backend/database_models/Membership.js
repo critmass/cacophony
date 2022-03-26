@@ -378,7 +378,7 @@ class Membership {
     };
     /**Updates the membership
      *
-     * expects: {nickname, roleId}
+     * expects: {nickname, roleId, pictureUrl}
      * returns: {
      *              id,
      *              user_id,

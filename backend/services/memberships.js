@@ -9,34 +9,35 @@ const newMembershipSchema = require("../json_schema/membershipNew.json")
 const updateMemebershipSchema = require("../json_schema/membershipUpdate.json")
 const { BadRequestError, UnauthorizedError } = require("../expressError");
 
-/** POST / {userId, roleId, nickname, pictureUrl} =>
- *                                          {membership:{
- *                                              server_id,
- *                                              membership:{
- *                                                  member_id
- *                                                  user_id,
- *                                                  role:{
- *                                                      id,
- *                                                      title,
- *                                                      color,
- *                                                      is_admin,
- *                                                      access:[{
- *                                                          room_id,
- *                                                          read_only,
- *                                                          is_moderator
- *                                                      }, ...]
- *                                                  },
- *                                                  nickname,
- *                                                  join_date,
- *                                                  picture_url
- *                                              }
- *                                          }}
+/** POST / {userId, roleId, nickname, pictureUrl} => {
+ *              membership:{
+ *                server_id,
+ *                membership:{
+ *                    member_id
+ *                    user_id,
+ *                    role:{
+ *                        id,
+ *                        title,
+ *                        color,
+ *                        is_admin,
+ *                        access:[
+ *                          { room_id, read_only, is_moderator }
+ *                        , ...]
+ *                    },
+ *                    nickname,
+ *                    join_date,
+ *                    picture_url
+ *                }
+ *            }}
  * */
 
 const createMembership = async (req, res, next) => {
 
     try {
-        const validator = jsonschema.validate(req.body, newMembershipSchema)
+        console.log(req.body)
+        const validator = jsonschema.validate(
+            req.body, newMembershipSchema
+        )
 
         if(!validator.valid) throw new BadRequestError(validator.errors)
 
@@ -153,14 +154,14 @@ const patchMembership = async (req, res, next) => {
 }
 
 /** DELETE /[member_id] => {
- *                              membership:{
- *                                      id,
- *                                      server_id,
- *                                      user_id,
- *                                      nickname,
- *                                      role_id
- *                              }
- *                          }
+ *                  membership:{
+ *                      id,
+ *                      server_id,
+ *                      user_id,
+ *                      nickname,
+ *                      role_id
+ *                  }
+ *              }
  * */
 
 const deleteMembership = async (req, res, next) => {

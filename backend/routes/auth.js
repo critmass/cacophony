@@ -13,6 +13,7 @@ const { createToken } = require("../helpers/tokens");
 const userAuthSchema = require("../json_schema/userAuth.json");
 const userRegisterSchema = require("../json_schema/userRegister.json")
 const { BadRequestError } = require("../expressError");
+const { authenticateJWT } = require("../middleware/auth");
 
 /** POST /auth/token:  { username, password } => { token }
  *
@@ -35,7 +36,7 @@ router.post("/token", async (req, res, next) => {
         const token = createToken(user);
         await User.updateLastOn(user.id)
 
-        return res.status(200).json({ token, user_id:user.id });
+        return res.status(200).json({ token });
 
     } catch(err) {
         return next(err)
@@ -48,14 +49,28 @@ router.post("/token", async (req, res, next) => {
  * Authorization required: user
  */
 
-router.get("/update", async (req, res, next) => {
+router.get("/update", authenticateJWT, async (req, res, next) => {
     try {
+        console.log(res.locals)
         const userId = res.locals.user.id
 
         const user = await User.get(userId);
+        const formatedUser = {
+            id:user.id,
+            username:user.username,
+            is_site_admin:user.is_site_admin,
+            memberships:user.memberships.map( membership => {
+                return {
+                    id: membership.id,
+                    server_id: membership.server.id,
+                    role_id: membership.role.id,
+                    is_admin: membership.role.is_admin
+                }
+            })
+        }
 
-        const token = createToken(user);
         await User.updateLastOn(user.id)
+        const token = createToken(formatedUser);
 
         return res.status(200).json({ token });
 
