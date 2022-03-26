@@ -1,0 +1,36 @@
+.ManageServerRooms {
+    text-align: center;
+}
+
+.ManageServerRooms-title {
+    margin-top: 5vh;
+    color:whitesmoke;
+}
+
+.ManageServerRooms-form {
+    margin-left:10%;
+    width: 80%;
+
+}
+
+.ManageServerRooms-ul {
+    margin-top: 3vh;
+    list-style-type: none;
+    height: 58vh;
+    overflow-y: scroll;
+}
+
+.ManageServerRoomEntry {
+    font-size: large;
+    color: aliceblue;
+}
+
+.ManageServerRoomEntry-trash {
+    font-size: xx-large;
+    padding: 1vh;
+    border-radius: 100%;
+}
+
+.ManageServerRoomEntry-trash:hover {
+    background-color: #363636;
+}

@@ -5,6 +5,7 @@
 .Sidebar {
     list-style-type: none;
     text-align: left;
+    overflow-y: scroll;
 }
 
 .Sidebar-li {
@@ -49,5 +50,17 @@
 .Sidebar-li:hover > .SidebarElement {
     color: #bababa;
 
+}
+
+.RoomSidebar {
+    height: 83vh;
+}
+
+.MembersSidebar {
+    height: 83vh;
+}
+
+.MainSidebar {
+    height: 90vh;
 }
 

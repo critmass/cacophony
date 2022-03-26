@@ -1,0 +1,18 @@
+.ManageServerMemberList-title {
+    color: aliceblue;
+    text-align: center;
+}
+
+.ManageServerMemberList-ul {
+    list-style-type: none;
+    overflow-y: scroll;
+    height: 55vh;
+}
+
+.ManageServerMemberEntry-name {
+    color: azure;
+}
+
+.ManageServerMemberEntry-id {
+    color: gray;
+}

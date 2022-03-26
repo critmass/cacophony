@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import { Button } from "reactstrap";
 import { loginUserByToken } from "../../Actions/userActionMaker";
+import { ACCEPTABLE_IMAGE_URLS } from "../../defaultSettings";
 import useChangeHandler from "../../hooks/useChangeHandler";
 import InputGroupBundle from "../InputGroupBundle/InputGroupBundle";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
@@ -10,10 +11,10 @@ import "./UpdateProfile.css"
 
 const UpdateProfile = ({pullProfile, pushProfile}) => {
     const {userId} = useParams()
-    const currUser = useSelector(state => state.user)
     const token = useSelector(state => state.token)
     const [flags, setFlags] = useState({
         isLoading:true,
+        invalidPic:false,
         error:false,
         success:false
     })
@@ -26,25 +27,41 @@ const UpdateProfile = ({pullProfile, pushProfile}) => {
     const handleSubmit = async () => {
         try {
             setFlags(state => ({...state, isLoading:true}))
-            const updatedUser = await pushProfile(inputs)
-            dispatch(loginUserByToken(token))
-            setFlags({
-                isLoading: false,
-                error: false,
-                success: true
-            })
+            if(
+                ACCEPTABLE_IMAGE_URLS.includes(
+                    inputs.pictureUrl.slice(
+                        inputs.pictureUrl.length-4
+                ))
+            ) {
+                const updatedUser = await pushProfile(inputs)
+                dispatch(loginUserByToken(token))
+                setFlags({
+                    isLoading: false,
+                    invalidPic: false,
+                    error: false,
+                    success: true
+                })
+            }
+            else {
+                setFlags(state => {
+                    return {...state, invalidPic:true, isLoading:false}
+                })
+            }
+
         } catch (err) {
-            setFlags({
+            setFlags(state => ({
+                ...state,
                 isLoading: false,
                 error: true,
                 success: false
-            })
+            }))
         }
     }
     useEffect(() => {
         const getUserToUpdate = async () => {
             setFlags({
                 isLoading: true,
+                invalidPic: false,
                 error: false,
                 success: false
             })
@@ -59,7 +76,7 @@ const UpdateProfile = ({pullProfile, pushProfile}) => {
 
     if(flags.isLoading) return (<LoadingScreen/>)
 
-    return (<div>
+    return (<div className="UpdateProfile">
         <div className="row UpdateProfile-flags">
             {flags.success ?
                 (<span className="UpdateProfile-flags-success">
@@ -71,8 +88,13 @@ const UpdateProfile = ({pullProfile, pushProfile}) => {
                     </span>):
                     <></>
             }
+            {flags.invalidPic ?
+                (<span className="UpdateProfile-flags-invalidPic">
+                    That was an invalid picture url.
+                </span>):<></>
+            }
         </div>
-        <div className="row UpdateProfiles-inputs">
+        <div className="row UpdateProfile-inputs">
             <InputGroupBundle
                 name={"name"}
                 value={inputs.name}
@@ -87,7 +109,10 @@ const UpdateProfile = ({pullProfile, pushProfile}) => {
                 label={"PICTURE URL"}
                 type="text"
             />
-            <Button onClick={handleSubmit}>
+            <Button
+                onClick={handleSubmit}
+                className="UpdateProfile-btn"
+            >
                 UPDATE
             </Button>
         </div>

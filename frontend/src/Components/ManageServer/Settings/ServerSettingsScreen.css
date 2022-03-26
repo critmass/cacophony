@@ -1,0 +1,14 @@
+.ServerSettingsScreen {
+    text-align: center;
+}
+
+.ServerSettingsScreen-title {
+    margin-top: 5vh;
+    color: whitesmoke;
+}
+
+.ServerSettingsScreen-inputs {
+    margin-top: 10vh;
+    margin-left: 10%;
+    width: 80%;
+}

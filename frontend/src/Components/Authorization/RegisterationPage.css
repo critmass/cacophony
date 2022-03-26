@@ -1,0 +1,17 @@
+.RegistrationPage {
+    text-align: center;
+}
+
+.RegistrationPage-title {
+    margin-top: 5vh;
+}
+
+.RegistrationPage-flags {
+    height: 5vh;
+}
+
+.RegistrationPage-form {
+    margin-top: 10vh;
+    margin-left: 10%;
+    width: 80%;
+}

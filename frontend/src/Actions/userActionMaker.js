@@ -32,15 +32,13 @@ const getUser = userId => {
 
 const loginUser = (username, password) => {
     const loginUserFromApi = async dispatch => {
-        const {
-            token,
-            user_id
-        } = await CacophonyApi.login(
+        const { token } = await CacophonyApi.login(
             username,
             password
         )
-        const user = await CacophonyApi.getUser(user_id)
-        localStorage.setItem("userId", user_id)
+        const {id} = jwt.decode(token)
+        const user = await CacophonyApi.getUser(id)
+        localStorage.setItem("userId", id)
         const memberships = user.memberships
         const userInfo = extractUserInfo(user)
         dispatch(gotToken(token))

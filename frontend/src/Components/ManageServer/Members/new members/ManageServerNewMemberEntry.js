@@ -18,8 +18,11 @@ const ManageServerNewMemberEntry = ({
                 DEFAUT_IMAGE_URL
             }
         />
-        <span className="ManagerServerNewMemberEntry-username">
-            {user.username} (#{user.id})
+        <span className="ManageServerNewMemberEntry-name">
+            {user.username}
+        </span>
+        <span className="ManageServerNewMemeberEntry-id">
+            (#{user.id})
         </span>
         <ManageServerNewMemberDropdown
             user={user}

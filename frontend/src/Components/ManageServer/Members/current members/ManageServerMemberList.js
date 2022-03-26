@@ -28,18 +28,25 @@ const ManageServerMemberList = () => {
         })
     }
 
-    return (<ul>
-        {server.members.map( member => {
-            return (<li key={member.key}>
-                <ManageServerMemberEntry
-                    memberInfo={member}
-                    dropdownIsOpen={ roleDropdownIsOpen[member.id] }
-                    toggle={ () => openRole(member.id) }
-                />
-            </li>)
-        })}
-    </ul>
-    )
+    return (<>
+        <h1 className="h1 ManageServerMemberList-title">
+            Current Users
+        </h1>
+        <ul className="ManageServerMemberList-ul">
+            {server.members.map( member => {
+                return (<li
+                    key={member.key}
+                    className="ManageServerMemberList-li"
+                >
+                    <ManageServerMemberEntry
+                        memberInfo={member}
+                        dropdownIsOpen={ roleDropdownIsOpen[member.id] }
+                        toggle={ () => openRole(member.id) }
+                    />
+                </li>)
+            })}
+        </ul>
+    </>)
 
 }
 

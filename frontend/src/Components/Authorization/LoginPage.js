@@ -13,30 +13,50 @@ const LoginPage = () => {
     const [inputs, setInputs] = useState({
         username:"", password:""
     })
+    const [flags, setFlags] = useState({
+        error:false
+    })
     const handleChange = useChangeHandler(setInputs)
     const handleSubmit = () => {
-        const {username, password} = inputs
-        dispatch(loginUser(username, password))
-        history.push("/")
+        try {
+            const {username, password} = inputs
+            dispatch(loginUser(username, password))
+            history.push("/")
+        } catch (err) {
+            setFlags({error:true})
+        }
     }
-    return (<div>
-        <InputGroupBundle
-            name={'username'}
-            value={inputs.username}
-            onChange={handleChange}
-            label={'USERNAME'}
-            type="text"
-        />
-        <InputGroupBundle
-            name="password"
-            value={inputs.password}
-            onChange={handleChange}
-            label="PASSWORD"
-            type="password"
-        />
-        <Button onClick={handleSubmit}>
+    return (<div className="LoginPage">
+        <h1 className="display-4 LoginPage-title">
             Login
-        </Button>
+        </h1>
+        <div className="LoginPage-flags">
+            {
+                flags.error ?
+                    (<span className="LoginPage-flags-error">
+                        There was an error
+                    </span>):<></>
+            }
+        </div>
+        <div className="LoginPage-form">
+            <InputGroupBundle
+                name={'username'}
+                value={inputs.username}
+                onChange={handleChange}
+                label={'USERNAME'}
+                type="text"
+            />
+            <InputGroupBundle
+                name="password"
+                value={inputs.password}
+                onChange={handleChange}
+                label="PASSWORD"
+                type="password"
+            />
+            <Button onClick={handleSubmit}>
+                Login
+            </Button>
+        </div>
     </div>)
 }
 

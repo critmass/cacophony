@@ -5,4 +5,10 @@
 
 .MembershipProfileScreen {
     text-align: center;
+    color: whitesmoke;
+}
+
+.MembershipProfileScreen-title {
+    font-weight: bolder;
+    margin-right: 1vh;
 }

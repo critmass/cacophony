@@ -1,0 +1,20 @@
+.ManageServerMemberAdditions-ul {
+    margin-top: 1vh;
+    list-style-type: none;
+    height: 47vh;
+    overflow-y: scroll;
+}
+
+.ManageServerMemberAdditions-title {
+    text-align: center;
+    color: aliceblue;
+    margin-bottom: 3vh;
+}
+
+.ManageServerNewMemberEntry-name {
+    color: azure;
+}
+
+.ManageServerNewMemeberEntry-id {
+    color: gray;
+}

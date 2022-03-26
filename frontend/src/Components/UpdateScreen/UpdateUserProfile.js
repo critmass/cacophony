@@ -40,10 +40,12 @@ const UpdateUserProfile = () => {
         <h1 className="display-2 UpdateUserProfile-title">
             Update User Profile
         </h1>
-        <UpdateProfile
-            pushProfile={pushProfile}
-            pullProfile={pullProfile}
-        />
+        <div className="UpdateUserProfile-form">
+            <UpdateProfile
+                pushProfile={pushProfile}
+                pullProfile={pullProfile}
+            />
+        </div>
     </div>)
 }
 

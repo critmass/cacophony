@@ -49,16 +49,19 @@ const UpdateMembershipProfile = () => {
         <h1 className="display-4 UpdateMemberProfile-title">
             Update Membership
         </h1>
-        <UpdateProfile
-            pullProfile={pullProfile}
-            pushProfile={pushProfile}
-        />
-        <Button
-            onClick={handleRemove}
-            className="UpdateMemberProfile-btn"
-        >
-            Leave Server
-        </Button>
+        <div className="UpdateMemberProfile-form">
+
+            <UpdateProfile
+                pullProfile={pullProfile}
+                pushProfile={pushProfile}
+            />
+            <Button
+                onClick={handleRemove}
+                className="UpdateMemberProfile-btn"
+            >
+                Leave Server
+            </Button>
+        </div>
     </div>)
 }
 

@@ -1,3 +1,13 @@
 .UpdateUserProfile-title {
     text-align: center;
+    color: whitesmoke;
+    margin-top: 5vh;
+    margin-bottom: 15vh;
 }
+
+.UpdateUserProfile-form {
+    width: 80%;
+    margin-left: 10%;
+    text-align: center;
+}
+

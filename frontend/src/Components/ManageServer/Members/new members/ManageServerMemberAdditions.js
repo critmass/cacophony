@@ -53,24 +53,32 @@ const ManageServerMemberAdditions = () => {
     if (isLoading) return (<LoadingScreen />)
 
     return (<>
+        <h1 className="h1 ManageServerMemberAdditions-title">
+            New Members
+        </h1>
         <SearchForm
             setResults={setSearchResults}
             dataSet={userList}
             searchBy={"username"}
         />
-        {
-            searchResults.map(user => {
-                return (<li key={`newUser${user.id}`}>
-                    <ManageServerNewMemberEntry
-                        user={user}
-                        roleDropdownIsOpen={
-                            roleDropdownIsOpen[Number(user.id)]
-                        }
-                        openRole={openRole}
-                    />
-                </li>)
-            })
-        }
+        <ul className="ManageServerMemberAdditions-ul">
+            {
+                searchResults.map(user => {
+                    return (<li
+                        key={`newUser${user.id}`}
+                        className="ManageServerMemberAdditions-li"
+                    >
+                        <ManageServerNewMemberEntry
+                            user={user}
+                            roleDropdownIsOpen={
+                                roleDropdownIsOpen[Number(user.id)]
+                            }
+                            openRole={openRole}
+                        />
+                    </li>)
+                })
+            }
+        </ul>
     </>)
 }
 

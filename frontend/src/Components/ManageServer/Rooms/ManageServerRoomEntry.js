@@ -19,7 +19,10 @@ const ManageServerRoomEntry = ({room}) => {
     }
 
     return (<span className="ManageServerRoomEntry">
-        <Trash3 onClick={handleClick}/> {room.name}
+        <Trash3
+            onClick={handleClick}
+            className="ManageServerRoomEntry-trash"
+        /> {room.name}
     </span>)
 }
 
