@@ -1,12 +1,12 @@
 import React from "react";
-import ServerNavBar from "../NavBar/ServerNavbar";
+import ServerNavMenu from "../ServerNavMenu/ServerNavMenu";
 import MembersSidebar from "../Sidebar/MembersSidebar";
 import RoomSidebar from "../Sidebar/RoomSidebar";
 import "./ServerFrame.css"
 
 const ServerFrame = ({children}) => {
     return (<>
-        <ServerNavBar/>
+        <ServerNavMenu/>
         <div className="row ServerFrame-row">
             <div className="col-2 ServerFrame-RoomSidebar">
                 <RoomSidebar/>

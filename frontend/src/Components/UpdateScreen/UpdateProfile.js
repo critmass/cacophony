@@ -6,10 +6,12 @@ import { loginUserByToken } from "../../Actions/userActionMaker";
 import useChangeHandler from "../../hooks/useChangeHandler";
 import InputGroupBundle from "../InputGroupBundle/InputGroupBundle";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
+import "./UpdateProfile.css"
 
 const UpdateProfile = ({pullProfile, pushProfile}) => {
     const {userId} = useParams()
     const currUser = useSelector(state => state.user)
+    const token = useSelector(state => state.token)
     const [flags, setFlags] = useState({
         isLoading:true,
         error:false,
@@ -25,9 +27,7 @@ const UpdateProfile = ({pullProfile, pushProfile}) => {
         try {
             setFlags(state => ({...state, isLoading:true}))
             const updatedUser = await pushProfile(inputs)
-            if(currUser.id === updatedUser.id) {
-                dispatch(loginUserByToken())
-            }
+            dispatch(loginUserByToken(token))
             setFlags({
                 isLoading: false,
                 error: false,
@@ -50,28 +50,29 @@ const UpdateProfile = ({pullProfile, pushProfile}) => {
             })
 
             const user = await pullProfile()
+            console.log(user)
             setInputs({...user, pictureUrl:user.picture_url})
             setFlags(state => ({...state, isLoading:false}))
         }
         getUserToUpdate()
     }, [userId])
 
-    if(flags.isLoading) return <LoadingScreen/>
+    if(flags.isLoading) return (<LoadingScreen/>)
 
     return (<div>
-        <div className="row">
+        <div className="row UpdateProfile-flags">
             {flags.success ?
-                (<span className="">
+                (<span className="UpdateProfile-flags-success">
                     Successfully updated
                 </span>):
                 flags.error ?
-                    (<span className="">
+                    (<span className="UpdateProfile-flags-error">
                         There was an error
                     </span>):
                     <></>
             }
         </div>
-        <div className="row">
+        <div className="row UpdateProfiles-inputs">
             <InputGroupBundle
                 name={"name"}
                 value={inputs.name}

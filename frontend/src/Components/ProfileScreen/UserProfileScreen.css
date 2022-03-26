@@ -1,0 +1,14 @@
+.UserProfileScreen {
+    text-align: center;
+    margin-top: 5vh;
+}
+
+.UserProfileScreen-IconImage {
+    height: 5cm;
+    width: 5cm;
+}
+
+.UserProfileScreen-membership-ul {
+    height: 25vh;
+    overflow-y: scroll;
+}

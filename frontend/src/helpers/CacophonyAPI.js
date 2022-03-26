@@ -6,7 +6,7 @@ const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
 class CacophonyApi {
 
     static token;
-    // static serverWebSocket;
+
 
     static async request(endpoint, data = {}, method = "get") {
 

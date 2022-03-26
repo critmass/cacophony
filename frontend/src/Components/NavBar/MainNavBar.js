@@ -43,17 +43,19 @@ const MainNavBar = () => {
             <Navbar>
                 <Nav>
                     <NavItem>
-                        <NavLink to="/signup">
-                            <span className="MainNavBar-link">
-                                Sign Up
-                            </span>
+                        <NavLink
+                            to="/signup"
+                            className="MainNavBar-link"
+                        >
+                            Sign Up
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink to="/login">
-                            <span className="MainNavBar-link">
-                                Log In
-                            </span>
+                        <NavLink
+                            to="/login"
+                            className="MainNavBar-link"
+                        >
+                            Log In
                         </NavLink>
                     </NavItem>
                 </Nav>

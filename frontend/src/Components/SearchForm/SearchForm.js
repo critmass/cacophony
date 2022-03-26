@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import useChangeHandler from '../../hooks/useChangeHandler'
 import { Button, Input, InputGroup, InputGroupAddon } from 'reactstrap'
+import "./SearchForm.css"
 
 const SearchForm = ({setResults, dataSet, searchBy, placeholder}) => {
 
@@ -23,6 +24,10 @@ const SearchForm = ({setResults, dataSet, searchBy, placeholder}) => {
         setSearchTerm("")
     }
 
+    const onKeyDown = e => {
+        if(e.keyCode === 13) handleSearch()
+    }
+
     return (<InputGroup>
         <Input
             type="text"
@@ -30,6 +35,7 @@ const SearchForm = ({setResults, dataSet, searchBy, placeholder}) => {
             value={searchTerm.searchTerm}
             onChange={handleChange}
             placeholder={placeholder}
+            onKeyDown={onKeyDown}
         />
         <InputGroupAddon addonType="append">
             <Button onClick={handleSearch}>

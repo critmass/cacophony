@@ -1,10 +1,26 @@
 import React from "react";
+import "./PS_MembershipInfo.css"
 
 const PS_MembershipInfo = ({data}) => {
     return (<>
-        Server:<span>{data.server.name}</span>  <br/>
-        Nickname:<span>{data.nickname}</span>  <br/>
-        Role:<span>{data.role.title}</span>
+        <span className="PS_MembershipInfo-server-title">
+            Server:
+        </span>
+        <span className="PS_MemebershipInfo-server-content">
+            {data.server.name}
+        </span>  <br/>
+        <span className="PS_MemebershipInfo-nickname-title">
+            Nickname:
+        </span>
+        <span className="PS_MemebershipInfo-nickname-content">
+            {data.nickname}
+        </span>  <br/>
+        <span className="PS_MemebershipInfo-role-title">
+            Role:
+        </span>
+        <span className="PS_MemebershipInfo-role-content">
+            {data.role.title}
+        </span>
     </>)
 }
 

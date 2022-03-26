@@ -1,9 +1,9 @@
-import { CLEAR_USER, GET_USER, UPDATE_USER } from "./actionList"
-import CacophonyApi from "../helpers/CacophonyAPI"
-import { gotMemberships } from "./membershipActionMaker"
-import { getUpdatedToken, gotToken } from "./tokenActionMaker"
-import {v4 as uuid} from "uuid"
-import jwt from "jsonwebtoken"
+import { CLEAR_USER, GET_USER, UPDATE_USER } from "./actionList";
+import CacophonyApi from "../helpers/CacophonyAPI";
+import { gotMemberships } from "./membershipActionMaker";
+import { getUpdatedToken, gotToken } from "./tokenActionMaker";
+import { v4 as uuid } from "uuid";
+import jwt from "jsonwebtoken";
 
 const gotUser = user => {
     return {type:GET_USER, user}
@@ -32,7 +32,13 @@ const getUser = userId => {
 
 const loginUser = (username, password) => {
     const loginUserFromApi = async dispatch => {
-        const {token, user_id} = await CacophonyApi.login(username, password)
+        const {
+            token,
+            user_id
+        } = await CacophonyApi.login(
+            username,
+            password
+        )
         const user = await CacophonyApi.getUser(user_id)
         localStorage.setItem("userId", user_id)
         const memberships = user.memberships

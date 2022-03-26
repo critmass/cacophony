@@ -8,7 +8,7 @@ import {
     GET_SERVER,
     UPDATE_SERVER
 } from "./actionList"
-import { getUser } from "./userActionMaker"
+import { loginUserByToken } from "./userActionMaker"
 
 const gotServer = (server) => {
     return {type:GET_SERVER, server}
@@ -40,9 +40,10 @@ const addedServer = (server) => {
 
 const addServer = (serverData) => {
     const addServerToApi = async dispatch => {
-        const {server, membership} = await CacophonyApi.addServer(serverData)
-        const userId = membership.user_id
-        dispatch(getUser(userId))
+        await CacophonyApi.addServer(serverData)
+        const token = await CacophonyApi.updateToken()
+        dispatch(loginUserByToken(token))
+
     }
     return addServerToApi
 }

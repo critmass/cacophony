@@ -16,8 +16,8 @@ const ManageServerMemberEntry = ({
                     memberInfo.picture_url :
                     DEFAUT_IMAGE_URL
                 }
-            />
-        {memberInfo.nickname}
+        />
+        {memberInfo.nickname} (#{memberInfo.user_id})
         <ManageServerMemberRoleDropdown
             memberInfo={memberInfo}
             isOpen={dropdownIsOpen}

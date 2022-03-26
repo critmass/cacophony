@@ -6,8 +6,9 @@ import { loginUserByToken } from "../../../Actions/userActionMaker";
 import CacophonyApi from "../../../helpers/CacophonyAPI";
 import useChangeHandler from "../../../hooks/useChangeHandler";
 import InputGroupBundle from "../../InputGroupBundle/InputGroupBundle";
-// import LoadingScreen from "../../LoadingScreen/LoadingScreen";
-import "./ManagerServerRooms.css"
+import "./ManageServerRooms.css"
+import ManageServerRoomEntry from "./ManageServerRoomEntry";
+import { getServer } from "../../../Actions/serverActionMaker";
 
 const ManagerServerRooms = () => {
     const {serverId} = useParams()
@@ -21,15 +22,9 @@ const ManagerServerRooms = () => {
     const handleChange = useChangeHandler(setInputs)
     const handleSubmit = async () => {
         await CacophonyApi.addRoom(serverId, inputs)
-        dispatch(loginUserByToken(token))
+        dispatch(getServer(serverId))
         setInputs({...defaultInputs})
     }
-    const handleClickRemove = async e => {
-        const roomId = e.target.roomId
-        await CacophonyApi.removeRoom(serverId, roomId)
-    }
-
-    // if(isLoading) return <LoadingScreen/>
 
     const addRoomButton = () => {
         return (<Button onClick={handleSubmit}>
@@ -48,9 +43,9 @@ const ManagerServerRooms = () => {
             />
             <ul>
                 {rooms.map(room => {
-                    return (<li>
-                        <span onClick={handleClickRemove}>X</span>
-                        <span>{room.name}</span>
+                    console.log(room)
+                    return (<li key={`room-${room.id}`}>
+                        <ManageServerRoomEntry room={room}/>
                     </li>)
                 })}
             </ul>

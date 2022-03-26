@@ -15,6 +15,10 @@ const ChatSubmissionLine = ({reload}) => {
         reload()
     }
 
+    const handleEnter = e => {
+        if(e.keyCode === 13) handleSubmit()
+    }
+
     const submitButton = <Button onClick={handleSubmit}>Submit</Button>
 
     return (<div className="mx-3 px-3 ChatSubmissionLine">
@@ -24,6 +28,7 @@ const ChatSubmissionLine = ({reload}) => {
             onChange={handleChange}
             label={submitButton}
             type={"text"}
+            onKeyDown={handleEnter}
         />
     </div>)
 }

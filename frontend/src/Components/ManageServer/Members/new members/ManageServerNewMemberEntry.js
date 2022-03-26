@@ -19,7 +19,7 @@ const ManageServerNewMemberEntry = ({
             }
         />
         <span className="ManagerServerNewMemberEntry-username">
-            {user.username}
+            {user.username} (#{user.id})
         </span>
         <ManageServerNewMemberDropdown
             user={user}

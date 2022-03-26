@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import CacophonyApi from "../../helpers/CacophonyAPI";
+import IconImage from "../IconImage/IconImage";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import NotFound404 from "../NotFound404/NotFound404";
+import "./MembershipProfileScreen.css"
 
 const MembershipProfileScreen = () => {
     const {serverId, memberId} = useParams()
@@ -19,7 +21,11 @@ const MembershipProfileScreen = () => {
 
     if(isLoading) return <LoadingScreen/>
     try {
-        return (<div>
+        return (<div className="MembershipProfileScreen">
+            <IconImage
+                img={membership.picture_url}
+                className={"MembershipProfileScreen-IconImage"}
+            />
             <h1 className="display-1">
                 {membership.nickname} Membership Profile
             </h1>
@@ -27,12 +33,19 @@ const MembershipProfileScreen = () => {
                 #{membership.id}
             </h2>
             <p>
-                Role: {membership.role.title}
+                <span className="MembershipProfileScreen-title">
+                    Role:
+                </span>
+                <span className="MembershipProfileScreen-content">
+                    {membership.role.title}
+                </span><br/>
+                <span className="MembershipProfileScreen-title">
+                    User:
+                </span>
+                <span className="MembershipProfileScreen-content">
+                    #{membership.user_id}
+                </span>
             </p>
-            <p>
-                Image: {membership.picture_url}
-            </p>
-            <img src={membership.picture_url}/>
         </div>)
 
     } catch (error) {

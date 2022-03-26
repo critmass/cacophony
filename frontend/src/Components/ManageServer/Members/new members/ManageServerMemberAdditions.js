@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import CacophonyApi from "../../../../helpers/CacophonyAPI";
 import LoadingScreen from "../../../LoadingScreen/LoadingScreen";
 import ManageServerNewMemberEntry from "./ManageServerNewMemberEntry";
+import "./ManageServerMemberAddition.css"
 
 const ManageServerMemberAdditions = () => {
     const [isLoading, setIsLoading] = useState(true)
@@ -39,6 +40,11 @@ const ManageServerMemberAdditions = () => {
                 users[user.id] = false
                 return users
             }, {}))
+            setSearchResults( state => {
+                return state.filter( user => {
+                    return !membersUserIds.has(user.id)
+                })
+            })
             setIsLoading(false)
         }
         getUserList()

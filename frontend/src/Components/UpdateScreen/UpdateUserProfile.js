@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import { updateUser } from "../../Actions/userActionMaker";
 import CacophonyApi from "../../helpers/CacophonyAPI";
 import UpdateProfile from "./UpdateProfile";
+import "./UpdateUserProfile.css"
 
 const UpdateUserProfile = () => {
     const { userId } = useParams()
@@ -14,6 +15,7 @@ const UpdateUserProfile = () => {
         let user = {}
         if(Number(currUser)===Number(userId)) {
             dispatch(updateUser(inputs, userId))
+
         }
         else {
             user = await CacophonyApi.updateUser(
@@ -22,22 +24,27 @@ const UpdateUserProfile = () => {
             )
         }
         return {
-            pictureUrl: user.picture_url,
+            ...user,
             username: user.name
         }
     }
     const pullProfile = async () => {
         const user = await CacophonyApi.getUser(userId)
         return {
-            pictureUrl: user.picture_url,
+            ...user,
             name: user.username
         }
 
     }
-    return (<UpdateProfile
-        pushProfile={pushProfile}
-        pullProfile={pullProfile}
-    />)
+    return (<div className="UpdateUserProfile">
+        <h1 className="display-2 UpdateUserProfile-title">
+            Update User Profile
+        </h1>
+        <UpdateProfile
+            pushProfile={pushProfile}
+            pullProfile={pullProfile}
+        />
+    </div>)
 }
 
 export default UpdateUserProfile

@@ -5,6 +5,7 @@ import { Button } from "reactstrap";
 import { getServer } from "../../Actions/serverActionMaker";
 import CacophonyApi from "../../helpers/CacophonyAPI";
 import UpdateProfile from "./UpdateProfile";
+import "./UpdateMemberProfile.css"
 
 const UpdateMembershipProfile = () => {
     const {memberId, serverId} = useParams()
@@ -21,31 +22,41 @@ const UpdateMembershipProfile = () => {
     }
 
     const pushProfile = async inputs => {
-        const user = await CacophonyApi.updateMembership(
+        const membership = await CacophonyApi.updateMembership(
             memberId,
             serverId,
             {...inputs, nickname:inputs.name}
         )
         dispatch(getServer(serverId))
         return {
-            pictureUrl: user.picture_url,
-            nickname: user.name
+            pictureUrl: membership.picture_url,
+            nickname: membership.name
         }
     }
     const pullProfile = async () => {
-        const user = await CacophonyApi.getMembership(memberId, serverId)
+        const membership = await CacophonyApi.getMembership(
+            memberId,
+            serverId
+        )
+
         return {
-            pictureUrl: user.picture_url,
-            name: user.nickname
+            picture_url: membership.picture_url,
+            name: membership.nickname
         }
 
     }
-    return (<div>
+    return (<div className="UpdateMemberProfile">
+        <h1 className="display-4 UpdateMemberProfile-title">
+            Update Membership
+        </h1>
         <UpdateProfile
             pullProfile={pullProfile}
             pushProfile={pushProfile}
         />
-        <Button onClick={handleRemove}>
+        <Button
+            onClick={handleRemove}
+            className="UpdateMemberProfile-btn"
+        >
             Leave Server
         </Button>
     </div>)

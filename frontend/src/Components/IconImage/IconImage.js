@@ -1,9 +1,9 @@
 import React from "react";
 import "./IconImage.css"
 
-const IconImage = ({img}) => {
+const IconImage = ({img, className}) => {
     return (
-        <img src={img} className={`IconImage`}/>
+        <img src={img} className={`IconImage ${className}`}/>
     )
 }
 

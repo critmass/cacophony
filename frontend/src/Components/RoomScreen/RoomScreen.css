@@ -6,7 +6,7 @@
 .RoomScreen > ul {
     list-style: none;
     overflow: auto;
-    height: 77vh;
+    height: 72vh;
     display: flex;
     text-align: left;
 
@@ -17,4 +17,18 @@
     position: absolute;
     width: 45vw;
     bottom: 3vh;
+}
+
+.ChatLine-poster-name {
+    color: aliceblue;
+    font-size: larger;
+}
+
+.ChatLine-post-date {
+    color: slategray;
+    margin-left: 2mm;
+}
+
+.ChatLine-content {
+    color: ghostwhite;
 }

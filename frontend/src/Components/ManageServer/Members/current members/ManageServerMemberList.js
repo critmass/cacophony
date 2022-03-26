@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ManageServerMemberEntry from "./ManageServerMemberEntry";
+import "./ManageServerMemberCurrent.css";
 
 const ManageServerMemberList = () => {
     const server = useSelector(state => state.server)
-    const [roleDropdownIsOpen, setRoleDropdownIsOpen] = useState(
-        server.members.reduce((members, member) => {
-            members[member.id] = false
-            return members
-        }, {})
-    )
+    const [roleDropdownIsOpen, setRoleDropdownIsOpen] = useState({})
+    useEffect(() => {
+        setRoleDropdownIsOpen(
+            server.members.reduce((members, member) => {
+                members[member.id] = false
+                return members
+            }, {})
+        )
+    }, [server])
+
     const openRole = memberId => {
         setRoleDropdownIsOpen(state => {
             const newState = {}

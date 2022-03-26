@@ -5,6 +5,7 @@ import { Button } from "reactstrap";
 import { loginUser } from "../../Actions/userActionMaker";
 import useChangeHandler from "../../hooks/useChangeHandler";
 import InputGroupBundle from "../InputGroupBundle/InputGroupBundle";
+import "./LoginPage.css"
 
 const LoginPage = () => {
     const dispatch = useDispatch()

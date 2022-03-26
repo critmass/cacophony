@@ -6,7 +6,6 @@ import Home from "../Components/Home/Home";
 import Logout from "../helpers/Logout";
 import FrontPage from "../Components/Home/FrontPage";
 import LoginPage from "../Components/Authorization/LoginPage";
-import ServerList from "../Components/ServerList/ServerList";
 import ServerPage from "../Components/ServerPage/ServerPage";
 import RoomScreen from "../Components/RoomScreen/RoomScreen";
 import NotFound404 from "../Components/NotFound404/NotFound404";
@@ -17,6 +16,7 @@ import UserProfileScreen from "../Components/ProfileScreen/UserProfileScreen";
 import UpdateUserProfile from "../Components/UpdateScreen/UpdateUserProfile";
 import ManagerServerRooms from "../Components/ManageServer/Rooms/ManageServerRooms";
 import ManageServerMembers from "../Components/ManageServer/Members/ManageServerMembers";
+import ServerSettingsScreen from "../Components/ManageServer/Settings/ServerSettingsScreen";
 import MembershipProfileScreen from "../Components/ProfileScreen/MembershipProfileScreen";
 import UpdateMembershipProfile from "../Components/UpdateScreen/UpdateMemberProfile";
 
@@ -44,9 +44,6 @@ const Routes = () => {
         <ProtectedRoute exact path={`/profile/:userId/update`}>
             <UpdateUserProfile/>
         </ProtectedRoute>
-        <ProtectedRoute exact path="/server">
-            <ServerList/>
-        </ProtectedRoute>
         <ProtectedRoute exact path="/server/add">
             <AddServerPage/>
         </ProtectedRoute>
@@ -68,6 +65,11 @@ const Routes = () => {
         <ProtectedRoute exact path="/server/:serverId/member">
             <ServerPage>
                 <ManageServerMembers/>
+            </ServerPage>
+        </ProtectedRoute>
+        <ProtectedRoute exact path="/server/:serverId/settings">
+            <ServerPage>
+                <ServerSettingsScreen/>
             </ServerPage>
         </ProtectedRoute>
         <ProtectedRoute exact path="/server/:serverId/member/:memberId">
