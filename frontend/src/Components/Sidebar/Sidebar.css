@@ -5,7 +5,16 @@
 .Sidebar {
     list-style-type: none;
     text-align: left;
+    overflow-y: hidden;
+}
+
+.Sidebar:hover {
     overflow-y: scroll;
+}
+
+.Sidebar::-webkit-scrollbar {
+    background-color: #222222;
+    width: 5px;
 }
 
 .Sidebar-li {

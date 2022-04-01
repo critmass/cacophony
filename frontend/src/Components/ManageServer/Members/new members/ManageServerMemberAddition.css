@@ -5,6 +5,10 @@
     overflow-y: scroll;
 }
 
+.ManageServerMemberAdditions-ul::-webkit-scrollbar {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .ManageServerMemberAdditions-title {
     text-align: center;
     color: aliceblue;

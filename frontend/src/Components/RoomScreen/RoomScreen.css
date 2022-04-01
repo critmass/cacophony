@@ -13,6 +13,15 @@
     flex-direction: column-reverse;
 }
 
+.RoomScreen > ul::-webkit-scrollbar {
+    background-color: rgba(0, 0, 0, 0);
+    width: 1mm;
+}
+
+.RoomScreen > ul:hover::-webkit-scrollbar-track-piece {
+    color: rgba(0, 0, 0, 50);
+}
+
 .ChatSubmissionLine {
     position: absolute;
     width: 45vw;

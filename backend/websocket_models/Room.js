@@ -1,6 +1,6 @@
 /** Chat rooms that can be joined/left/broadcast to. */
 
-const DatabaseRoom = require("../database_models/Room");
+const RoomDatabase = require("../database_models/Room");
 const { UnauthorizedError } = require("../expressError");
 
 // in-memory storage of roomId -> room
@@ -26,10 +26,17 @@ class Room {
 
     static async get (roomId) {
         if(!ROOMS.has(roomId)) {
-            ROOMS.set(roomId, new Room(roomId))
+            const roomData = await RoomDatabase.get(roomId)
+            ROOMS.set(roomId, new Room(roomData))
         }
 
         return ROOMS.get(roomId)
+    }
+
+    static async update(roomId, roomData) {
+        if(ROOMS.has(roomId)) {
+            ROOMS.get(roomId).name = roomData.name
+        }
     }
 
     /** creates a new instance of the Room object with a map of accepted
@@ -37,9 +44,7 @@ class Room {
      * error.
      * */
 
-    async constructor (roomId) {
-
-        const roomData = await DatabaseRoom.get(roomId)
+    constructor (roomData) {
 
         this.posts = roomData.posts
         this.id = roomData.id
